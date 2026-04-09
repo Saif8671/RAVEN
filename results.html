@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAVEN | Scan Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="results">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="RAVEN home">
+        <span class="brand-mark">R</span>
+        <span class="brand-text">
+          <strong>RAVEN</strong>
+          <small>Cyber risk scanner</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="scan.html">Scan</a>
+        <a href="results.html" class="active">Results</a>
+        <a href="incident.html">Incident</a>
+      </nav>
+      <a class="button button-small button-ghost" href="scan.html">Run another scan</a>
+    </header>
+
+    <main class="section results-layout">
+      <section class="results-hero reveal">
+        <span class="eyebrow">Scan completed</span>
+        <div class="results-header">
+          <div>
+            <h1>Northstar Bakery risk summary</h1>
+            <p class="lede">
+              A clean view of the score, the biggest issues, and the specific steps needed to
+              reduce exposure.
+            </p>
+          </div>
+          <div class="score-card">
+            <div class="score-ring" aria-label="Risk score 72 out of 100">
+              <strong>72</strong>
+              <span>Risk Score</span>
+            </div>
+            <span class="badge badge-high">High risk</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="results-grid">
+        <article class="panel-card reveal">
+          <h3>Top findings</h3>
+          <div class="finding-list">
+            <div class="finding finding-high">
+              <span class="badge badge-high">High</span>
+              <div>
+                <strong>SPF record not enforced</strong>
+                <p>
+                  Email spoofing is easier when the domain does not clearly restrict who can send
+                  mail on behalf of the business.
+                </p>
+              </div>
+            </div>
+            <div class="finding finding-medium">
+              <span class="badge badge-medium">Medium</span>
+              <div>
+                <strong>Login page exposed to the public internet</strong>
+                <p>
+                  Public access increases the chance of automated password attacks and credential
+                  stuffing.
+                </p>
+              </div>
+            </div>
+            <div class="finding finding-low">
+              <span class="badge badge-low">Low</span>
+              <div>
+                <strong>No confirmed breach signals found</strong>
+                <p>
+                  The current scan did not surface a direct breach match for the owner email
+                  domain.
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel-card reveal">
+          <h3>Plain-English explanation</h3>
+          <p class="result-copy">
+            RAVEN found a few issues that do not mean the business is compromised today, but they
+            do make it easier for attackers to trick employees or guess a way in.
+          </p>
+          <p class="result-copy">
+            The biggest fix is to lock down outbound email authentication, then reduce exposure on
+            the sign-in path and review the public website for obvious weak points.
+          </p>
+          <div class="confirmation-box">
+            <strong>Report delivery</strong>
+            <span>Final report sent to owner@northstarbakery.com</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="results-grid results-grid-wide">
+        <article class="panel-card reveal">
+          <h3>Fix steps</h3>
+          <ol class="fix-steps">
+            <li>Publish a strict SPF record and verify DMARC alignment.</li>
+            <li>Enable multifactor authentication on all administrative logins.</li>
+            <li>Review the public website for outdated plugins, forms, and weak headers.</li>
+            <li>Rescan weekly until the score drops into a lower-risk band.</li>
+          </ol>
+        </article>
+
+        <article class="panel-card reveal">
+          <h3>Risk breakdown</h3>
+          <div class="breakdown">
+            <div><span>Exposure</span><strong>High</strong></div>
+            <div><span>Identity</span><strong>Medium</strong></div>
+            <div><span>Breach signals</span><strong>Low</strong></div>
+            <div><span>Overall</span><strong>72 / 100</strong></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

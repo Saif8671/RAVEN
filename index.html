@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAVEN | Small Business Cybersecurity Scan</title>
+    <meta
+      name="description"
+      content="RAVEN scans your small business for exposure, explains the risk in plain English, and delivers fix steps by email."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="home">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="RAVEN home">
+        <span class="brand-mark">R</span>
+        <span class="brand-text">
+          <strong>RAVEN</strong>
+          <small>Cyber risk scanner</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="scan.html">Scan</a>
+        <a href="results.html">Results</a>
+        <a href="incident.html">Incident</a>
+      </nav>
+      <a class="button button-small button-ghost" href="scan.html">Start a scan</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">Built for small businesses</span>
+          <h1>Find the exposures that matter before attackers do.</h1>
+          <p class="lede">
+            RAVEN checks your website, email domain, and public footprint, then turns the
+            findings into a clear risk score and simple fix steps anyone can act on.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="scan.html">Start a free scan</a>
+            <a class="button button-secondary" href="incident.html">Emergency playbook</a>
+          </div>
+          <dl class="hero-metrics">
+            <div>
+              <dt>Average scan time</dt>
+              <dd>Under 2 min</dd>
+            </div>
+            <div>
+              <dt>Plain-English findings</dt>
+              <dd>Always included</dd>
+            </div>
+            <div>
+              <dt>Email report</dt>
+              <dd>Delivered automatically</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="hero-panel reveal">
+          <div class="panel-card scanner-card">
+            <div class="scanner-header">
+              <span class="scanner-dot"></span>
+              <span>Live scan preview</span>
+            </div>
+            <div class="scanner-radial">
+              <div class="scanner-radial-inner">
+                <strong>72</strong>
+                <span>Risk Score</span>
+              </div>
+            </div>
+            <ul class="scanner-list">
+              <li><span class="badge badge-high">High</span> SPF missing on primary domain</li>
+              <li><span class="badge badge-medium">Medium</span> 1 public login panel exposed</li>
+              <li><span class="badge badge-low">Low</span> No reported breach on email domain</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section proof">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Why teams use RAVEN</span>
+          <h2>Fast signal, clear language, and a path to action.</h2>
+        </div>
+        <div class="grid three-up">
+          <article class="feature-card reveal">
+            <div class="feature-icon">01</div>
+            <h3>Risk scoring that is easy to understand</h3>
+            <p>
+              Get one score for the business, plus severity labels that explain what needs
+              attention first.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">02</div>
+            <h3>Findings translated into plain English</h3>
+            <p>
+              RAVEN explains each issue without jargon and shows the impact in terms owners can
+              act on immediately.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">03</div>
+            <h3>Fix steps and report delivery built in</h3>
+            <p>
+              The final report includes step-by-step remediation guidance and a confirmation that
+              the report was sent by email.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split">
+        <div class="split-copy reveal">
+          <span class="eyebrow">What the flow looks like</span>
+          <h2>Designed for a short demo path from scan to report.</h2>
+          <div class="timeline">
+            <div>
+              <strong>1. Enter company details</strong>
+              <p>Business name, website URL, email domain, and owner email.</p>
+            </div>
+            <div>
+              <strong>2. Watch the scan run</strong>
+              <p>Validation, scanning, translation, and report dispatch are all shown as states.</p>
+            </div>
+            <div>
+              <strong>3. Review and act</strong>
+              <p>See the score, severity labels, and specific remediation steps in one place.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="callout reveal">
+          <h3>Ready to see it in action?</h3>
+          <p>
+            Open the scan experience to validate the form, simulate scan progress, and move into
+            the results page layout.
+          </p>
+          <a class="button" href="scan.html">Go to scan page</a>
+        </aside>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
