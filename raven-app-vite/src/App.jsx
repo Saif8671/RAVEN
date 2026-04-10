@@ -9,13 +9,12 @@ import { HomePage } from "./pages/HomePage";
 import { ScanPage } from "./pages/ScanPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { IncidentPage } from "./pages/IncidentPage";
-import { MOCK_REPORT } from "./data/mockData";
 
 import "./styles/global.css";
 
 export default function App() {
   const [page, setPage] = useState("home"); // home, scan, results, incident
-  const [report, setReport] = useState(MOCK_REPORT);
+  const [report, setReport] = useState(null);
 
   return (
     <>

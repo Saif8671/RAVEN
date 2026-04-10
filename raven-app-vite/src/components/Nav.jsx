@@ -1,13 +1,8 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 export function Nav({ page, setPage }) {
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="nav"
-    >
+    <Motion.nav className="nav">
       <div className="nav-logo" onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--accent)", boxShadow: "0 0 10px var(--accent)", animation: "pulse 2s infinite" }} />
         <span style={{ fontFamily: "var(--font-head)", fontSize: 22, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--text)" }}>RAVEN</span>
@@ -31,6 +26,6 @@ export function Nav({ page, setPage }) {
           Scan Your Business Free
         </button>
       </div>
-    </motion.nav>
+    </Motion.nav>
   );
 }

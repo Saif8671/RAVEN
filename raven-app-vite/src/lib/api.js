@@ -1,39 +1,29 @@
-import { MOCK_REPORT } from "../data/mockData";
-
-function normalizeReport(report) {
-  return {
-    ...MOCK_REPORT,
-    ...report,
-    findings: Array.isArray(report?.findings) && report.findings.length > 0 ? report.findings : MOCK_REPORT.findings,
-    summary_message: report?.summary_message || MOCK_REPORT.summary_message,
-    breach_details: report?.breach_details || MOCK_REPORT.breach_details,
-  };
+function getApiBaseUrl() {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "/api";
+  return baseUrl.replace(/\/+$/, "");
 }
 
 export async function runScan(payload) {
-  const response = await fetch("/api/scan", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  const apiBaseUrl = getApiBaseUrl();
+  let response;
 
-  if (!response.ok) {
-    const errorPayload = await response.json().catch(() => null);
-    throw new Error(errorPayload?.error || `Scan failed with status ${response.status}`);
+  try {
+    response = await fetch(`${apiBaseUrl}/scan`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error(`Unable to reach the scan backend at ${apiBaseUrl}.`);
   }
 
-  const data = await response.json();
-  return normalizeReport(data.report);
-}
+  const data = await response.json().catch(() => null);
 
-export function getFallbackReport(payload) {
-  return normalizeReport({
-    ...MOCK_REPORT,
-    business_name: payload.business_name || MOCK_REPORT.business_name,
-    website_url: payload.website_url || MOCK_REPORT.website_url,
-    email_domain: payload.email_domain || MOCK_REPORT.email_domain,
-    owner_email: payload.owner_email || MOCK_REPORT.owner_email,
-  });
+  if (!response.ok) {
+    throw new Error(data?.error || `Scan failed with status ${response.status}`);
+  }
+
+  return data;
 }

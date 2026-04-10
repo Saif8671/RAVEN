@@ -1,12 +1,53 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { FindingCard } from "../components/FindingCard";
-import { MOCK_REPORT } from "../data/mockData";
 
-export function ResultsPage({ setPage, report = MOCK_REPORT }) {
-  const activeReport = report || MOCK_REPORT;
+export function ResultsPage({ setPage, report }) {
+  const activeReport = report;
+
+  if (!activeReport) {
+    return (
+      <Motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{
+          padding: "140px 80px 80px",
+          maxWidth: 960,
+          margin: "0 auto",
+          minHeight: "70vh",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            padding: "48px",
+            borderRadius: 12,
+            border: "1px solid var(--border2)",
+            background: "var(--surface2)",
+            textAlign: "center",
+          }}
+        >
+          <div className="section-label" style={{ justifyContent: "center", marginBottom: 16 }}>
+            No Report Loaded
+          </div>
+          <h1 style={{ fontFamily: "var(--font-head)", fontSize: 42, fontWeight: 700, marginBottom: 16 }}>
+            Run a scan to generate results
+          </h1>
+          <p style={{ color: "var(--text2)", lineHeight: 1.7, marginBottom: 32 }}>
+            RAVEN no longer ships with a built-in sample report. Start a scan to load live results from the backend.
+          </p>
+          <button className="btn-primary" onClick={() => setPage("scan")}>
+            Start Security Scan {"->"}
+          </button>
+        </div>
+      </Motion.div>
+    );
+  }
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -50,7 +91,7 @@ export function ResultsPage({ setPage, report = MOCK_REPORT }) {
               textShadow: "0 0 40px rgba(255, 180, 171, 0.4)",
             }}
           >
-            {activeReport.risk_score}
+            {activeReport.risk_score ?? "—"}
             <span style={{ fontSize: 24, color: "var(--text3)", textShadow: "none" }}>/100</span>
           </div>
         </div>
@@ -58,12 +99,12 @@ export function ResultsPage({ setPage, report = MOCK_REPORT }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 64 }}>
         {[
-          { label: "Critical", count: activeReport.critical_count, color: "var(--threat)" },
-          { label: "High", count: activeReport.high_count, color: "#ffcc99" },
-          { label: "Medium", count: activeReport.medium_count, color: "#fce8b2" },
-          { label: "Low", count: activeReport.low_count, color: "var(--teal)" },
+          { label: "Critical", count: activeReport.critical_count ?? 0, color: "var(--threat)" },
+          { label: "High", count: activeReport.high_count ?? 0, color: "#ffcc99" },
+          { label: "Medium", count: activeReport.medium_count ?? 0, color: "#fce8b2" },
+          { label: "Low", count: activeReport.low_count ?? 0, color: "var(--teal)" },
         ].map((stat, i) => (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 + i * 0.1 }}
@@ -81,12 +122,12 @@ export function ResultsPage({ setPage, report = MOCK_REPORT }) {
             <div style={{ color: "var(--text2)", fontFamily: "var(--font-mono)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em" }}>
               {stat.label} Issues
             </div>
-          </motion.div>
+          </Motion.div>
         ))}
       </div>
 
       {activeReport.breach_detected && (
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.6 }}
@@ -101,24 +142,26 @@ export function ResultsPage({ setPage, report = MOCK_REPORT }) {
             alignItems: "flex-start",
           }}
         >
-          <div style={{ fontSize: 40 }}>⚠️</div>
+          <div style={{ fontSize: 40 }}>[!]</div>
           <div>
             <h3 style={{ fontFamily: "var(--font-head)", fontSize: 20, fontWeight: 700, color: "var(--threat)", marginBottom: 12 }}>
               Breach Detected: Password exposure likely
             </h3>
             <p style={{ color: "var(--text2)", lineHeight: 1.6, marginBottom: 24, maxWidth: 800 }}>
-              {activeReport.breach_details}
+              {activeReport.breach_details || "No breach details were returned by the backend."}
             </p>
             <button className="btn-primary" style={{ background: "var(--threat)", color: "#3e0000" }} onClick={() => setPage("incident")}>
-              View Incident Playbook →
+              View Incident Playbook {"->"}
             </button>
           </div>
-        </motion.div>
+        </Motion.div>
       )}
 
       <div style={{ marginBottom: 64, maxWidth: 800 }}>
         <h2 style={{ fontFamily: "var(--font-head)", fontSize: 28, fontWeight: 600, marginBottom: 24 }}>Plain-English Summary</h2>
-        <p style={{ fontSize: 18, color: "var(--text)", lineHeight: 1.7, fontWeight: 300 }}>{activeReport.summary_message}</p>
+        <p style={{ fontSize: 18, color: "var(--text)", lineHeight: 1.7, fontWeight: 300 }}>
+          {activeReport.summary_message || "No summary was returned by the backend."}
+        </p>
       </div>
 
       <div>
@@ -127,10 +170,22 @@ export function ResultsPage({ setPage, report = MOCK_REPORT }) {
           <span style={{ color: "var(--text3)", fontFamily: "var(--font-mono)", fontSize: 13 }}>Sorted by priority</span>
         </div>
 
-        {activeReport.findings.map((f, i) => (
-          <FindingCard key={f.id} f={f} idx={i} />
-        ))}
+        {Array.isArray(activeReport.findings) && activeReport.findings.length > 0 ? (
+          activeReport.findings.map((f, i) => <FindingCard key={f.id} f={f} idx={i} />)
+        ) : (
+          <div
+            style={{
+              padding: "32px",
+              borderRadius: 8,
+              border: "1px solid var(--border2)",
+              background: "var(--surface2)",
+              color: "var(--text2)",
+            }}
+          >
+            No findings were returned for this scan.
+          </div>
+        )}
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

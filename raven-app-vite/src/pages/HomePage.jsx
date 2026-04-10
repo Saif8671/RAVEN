@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { Ticker } from "../components/Ticker";
 import { GlowCard } from "../components/GlowCard";
 
@@ -40,42 +40,39 @@ export function HomePage({ setPage }) {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <section
         className="home-hero"
       >
         <div className="home-hero__glow" />
 
-        <motion.div variants={container} initial="hidden" animate="show" className="home-hero__content">
-          <motion.div variants={item} className="section-label" style={{ marginBottom: 32 }}>
+        <Motion.div variants={container} initial="hidden" animate="show" className="home-hero__content">
+          <Motion.div variants={item} className="section-label" style={{ marginBottom: 32 }}>
             AI Cybersecurity for Small Business
-          </motion.div>
-          <motion.div
+          </Motion.div>
+          <Motion.div
             variants={item}
             className="home-acronym"
           >
             RAVEN: Real-time Automated Vulnerability & Exposure Notifier
-          </motion.div>
-          <motion.h1 variants={item} className="home-hero__title">
+          </Motion.div>
+          <Motion.h1 variants={item} className="home-hero__title">
             Your silent
             <br />
             <span>guardian.</span>
             <br />
             Always watching.
-          </motion.h1>
-          <motion.p variants={item} className="home-hero__copy">
+          </Motion.h1>
+          <Motion.p variants={item} className="home-hero__copy">
             RAVEN is not a one-time security checker. It is a 24/7 autonomous AI security guardian purpose-built for small businesses.
             It scans, explains, fixes, monitors, and educates, so security becomes an ongoing service instead of a one-off report.
-          </motion.p>
-          <motion.div variants={item} className="home-hero__actions">
+          </Motion.p>
+          <Motion.div variants={item} className="home-hero__actions">
             <button className="btn-primary" onClick={() => setPage("scan")}>
-              Scan Your Business Free →
+              Scan Your Business Free {"->"}
             </button>
-            <button className="btn-ghost" onClick={() => setPage("results")}>
-              View Sample Report
-            </button>
-          </motion.div>
-        </motion.div>
+          </Motion.div>
+        </Motion.div>
       </section>
 
       <Ticker />
@@ -135,6 +132,6 @@ export function HomePage({ setPage }) {
           ))}
         </div>
       </section>
-    </motion.div>
+    </Motion.div>
   );
 }

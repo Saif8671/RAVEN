@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 export function GlowCard({ children, className = "", delay = 0 }) {
   const cardRef = useRef(null);
@@ -26,7 +26,7 @@ export function GlowCard({ children, className = "", delay = 0 }) {
   }, [isHovered]);
 
   return (
-    <motion.div
+    <Motion.div
       ref={cardRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -56,6 +56,6 @@ export function GlowCard({ children, className = "", delay = 0 }) {
       <div style={{ position: "relative", zIndex: 1 }}>
         {children}
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

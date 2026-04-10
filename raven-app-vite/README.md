@@ -17,21 +17,20 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Backend
 
-Run the local API from the repo root:
+Run the local API from the repo root in a second terminal:
 
 ```bash
 node backend/server.js
 ```
 
-If your terminal is already inside `backend/`, use:
+The Vite dev server proxies `/api` to `http://127.0.0.1:8788`, so the frontend can call the backend with a relative request.
+By default Vite runs on `http://localhost:5173`, so that is the frontend URL to open during local development.
 
-```bash
-npm start
-```
+Optional environment variables for the backend:
 
-The Vite dev server proxies `/api` to `http://127.0.0.1:8787`. Optional Supervity env vars:
-
-- `SUPERVITY_AUTHORIZATION`
-- `SUPERVITY_API_URL`
-- `SUPERVITY_API_KEY`
 - `SUPERVITY_WORKFLOW_ID`
+- `SUPERVITY_BEARER_TOKEN`
+- `SUPERVITY_API_URL`
+- `ALLOWED_ORIGINS`
+
+If those Supervity credentials are missing, the backend returns a local fallback report so the UI still works during development.

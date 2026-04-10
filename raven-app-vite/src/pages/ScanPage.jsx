@@ -1,10 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
-import { getFallbackReport, runScan } from "../lib/api";
+import { runScan } from "../lib/api";
+
+const AGENT_TEMPLATE = [
+  "Input Classifier",
+  "Web Vulnerability Scanner",
+  "Email Security Agent",
+  "Breach Detection Agent",
+  "Risk Scorer",
+  "Plain English Translator",
+  "Fix Guide Generator",
+  "Report Compiler & Dispatcher",
+];
 
 export function ScanPage({ setPage, setReport }) {
   const [step, setStep] = useState("form");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusText, setStatusText] = useState("");
   const [errorText, setErrorText] = useState("");
   const [form, setForm] = useState({
@@ -13,16 +25,9 @@ export function ScanPage({ setPage, setReport }) {
     email_domain: "",
     owner_email: "",
   });
-  const [agentStates, setAgentStates] = useState([
-    { name: "Input Classifier", status: "pending" },
-    { name: "Web Vulnerability Scanner", status: "pending" },
-    { name: "Email Security Agent", status: "pending" },
-    { name: "Breach Detection Agent", status: "pending" },
-    { name: "Risk Scorer", status: "pending" },
-    { name: "Plain English Translator", status: "pending" },
-    { name: "Fix Guide Generator", status: "pending" },
-    { name: "Report Compiler & Dispatcher", status: "pending" },
-  ]);
+  const [agentStates, setAgentStates] = useState(
+    AGENT_TEMPLATE.map((name) => ({ name, status: "pending" }))
+  );
   const timerRefs = useRef([]);
 
   useEffect(() => {
@@ -38,56 +43,61 @@ export function ScanPage({ setPage, setReport }) {
       timerRefs.current.push(id);
     });
 
+  const resetTimers = () => {
+    timerRefs.current.forEach(clearTimeout);
+    timerRefs.current = [];
+  };
+
   const startScan = async () => {
     if (!form.business_name || !form.website_url || !form.email_domain || !form.owner_email) {
       setErrorText("Please fill in all four fields before starting the scan.");
       return;
     }
 
-    timerRefs.current.forEach(clearTimeout);
-    timerRefs.current = [];
+    setIsSubmitting(true);
+    resetTimers();
     setStep("scanning");
     setErrorText("");
     setStatusText("Connecting to the scan backend...");
+    setAgentStates(AGENT_TEMPLATE.map((name) => ({ name, status: "pending" })));
 
-    const scanPromise = runScan(form).catch(() => getFallbackReport(form));
-    const delays = [400, 600, 700, 800, 1200, 900, 800, 700];
+    try {
+      const scanPromise = runScan(form);
+      const delays = [400, 600, 700, 800, 1200, 900, 800, 700];
 
-    for (let i = 0; i < agentStates.length; i += 1) {
-      // Keep the progress animation readable even while the backend runs.
-      // Each step is simulated so users can see the scan moving.
-      // The actual report can still resolve faster or slower.
-      // eslint-disable-next-line no-await-in-loop
-      await sleep(delays[i]);
-      setAgentStates((prev) =>
-        prev.map((a, idx) => ({
-          ...a,
-          status: idx < i ? "done" : idx === i ? "active" : "pending",
-        }))
-      );
-      setStatusText(`Running ${agentStates[i].name.toLowerCase()}...`);
+      for (let i = 0; i < AGENT_TEMPLATE.length; i += 1) {
+        await sleep(delays[i]);
+        setAgentStates((prev) =>
+          prev.map((agent, index) => ({
+            ...agent,
+            status: index < i ? "done" : index === i ? "active" : "pending",
+          }))
+        );
+        setStatusText(`Running ${AGENT_TEMPLATE[i].toLowerCase()}...`);
+      }
+
+      const report = await scanPromise;
+      setStatusText("Backend response received. Compiling the report...");
+      setAgentStates((prev) => prev.map((agent) => ({ ...agent, status: "done" })));
+
+      if (typeof setReport === "function") {
+        setReport(report);
+      }
+
+      const doneId = setTimeout(() => setPage("results"), 750);
+      timerRefs.current.push(doneId);
+    } catch (error) {
+      setStep("form");
+      setErrorText(error?.message || "Failed to run scan.");
+      setStatusText("");
+      setAgentStates(AGENT_TEMPLATE.map((name) => ({ name, status: "pending" })));
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const report = await scanPromise;
-
-    setAgentStates((prev) => prev.map((a) => ({ ...a, status: "done" })));
-    setStatusText("Scan complete. Preparing the report...");
-
-    if (typeof setReport === "function") {
-      setReport(report);
-    }
-
-    const doneId = setTimeout(() => setPage("results"), 750);
-    timerRefs.current.push(doneId);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="scan-page"
-    >
+    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="scan-page">
       <div className="scan-hero">
         <div className="section-label" style={{ justifyContent: "center" }}>
           Security Audit
@@ -125,7 +135,7 @@ export function ScanPage({ setPage, setReport }) {
                   <input
                     id={key}
                     value={form[key]}
-                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                    onChange={(e) => setForm((current) => ({ ...current, [key]: e.target.value }))}
                     placeholder={placeholder}
                     className="scan-field__input"
                   />
@@ -134,13 +144,26 @@ export function ScanPage({ setPage, setReport }) {
             </div>
 
             <div className="scan-panel__footer">
-              <p className="scan-panel__helper">Press start when ready. We’ll move straight into the scan flow.</p>
-              <button className="btn-primary scan-cta" onClick={startScan}>
-                Start Security Scan →
+              <p className="scan-panel__helper">Press start when ready. We will move straight into the scan flow.</p>
+              <button className="btn-primary scan-cta" onClick={startScan} disabled={isSubmitting}>
+                {isSubmitting ? "Connecting..." : "Start Security Scan ->"}
               </button>
             </div>
             {(statusText || errorText) && (
-              <div style={{ marginTop: 18, color: errorText ? "var(--threat)" : "var(--text3)", fontSize: 14 }}>
+              <div
+                role="status"
+                aria-live="polite"
+                style={{
+                  marginTop: 18,
+                  padding: "14px 16px",
+                  borderRadius: 8,
+                  border: errorText ? "1px solid rgba(255, 180, 171, 0.35)" : "1px solid rgba(208, 188, 255, 0.18)",
+                  background: errorText ? "rgba(255, 180, 171, 0.08)" : "rgba(208, 188, 255, 0.06)",
+                  color: errorText ? "var(--threat)" : "var(--text3)",
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                }}
+              >
                 {errorText || statusText}
               </div>
             )}
@@ -188,18 +211,18 @@ export function ScanPage({ setPage, setReport }) {
               }}
             />
           </div>
-          <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { 100% { transform: rotate(360deg); } }` }} />
+          <style dangerouslySetInnerHTML={{ __html: "@keyframes spin { 100% { transform: rotate(360deg); } }" }} />
 
           <div style={{ fontFamily: "var(--font-head)", fontSize: 20, fontWeight: 600, marginBottom: 6 }}>
             Scanning {form.business_name || "your business"}...
           </div>
           {statusText && <div style={{ color: "var(--text3)", marginBottom: 28, fontSize: 14 }}>{statusText}</div>}
           <div style={{ marginTop: 40, textAlign: "left" }}>
-            {agentStates.map((a, i) => (
-              <motion.div
+            {agentStates.map((agent, index) => (
+              <Motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: index * 0.1 }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -209,7 +232,7 @@ export function ScanPage({ setPage, setReport }) {
                   fontFamily: "var(--font-mono)",
                   fontSize: 13,
                 }}
-                key={i}
+                key={agent.name}
               >
                 <span
                   style={{
@@ -217,13 +240,13 @@ export function ScanPage({ setPage, setReport }) {
                     height: 8,
                     borderRadius: "50%",
                     background:
-                      a.status === "done" ? "var(--teal)" : a.status === "active" ? "var(--accent)" : "var(--text3)",
+                      agent.status === "done" ? "var(--teal)" : agent.status === "active" ? "var(--accent)" : "var(--text3)",
                     boxShadow:
-                      a.status !== "pending" ? `0 0 10px ${a.status === "done" ? "var(--teal)" : "var(--accent)"}` : "none",
-                    animation: a.status === "active" ? "pulse 1s infinite" : "none",
+                      agent.status !== "pending" ? `0 0 10px ${agent.status === "done" ? "var(--teal)" : "var(--accent)"}` : "none",
+                    animation: agent.status === "active" ? "pulse 1s infinite" : "none",
                   }}
                 />
-                <span style={{ flex: 1, color: a.status === "done" ? "var(--text)" : "var(--text2)" }}>{a.name}</span>
+                <span style={{ flex: 1, color: agent.status === "done" ? "var(--text)" : "var(--text2)" }}>{agent.name}</span>
                 <span
                   style={{
                     fontSize: 11,
@@ -232,21 +255,22 @@ export function ScanPage({ setPage, setReport }) {
                     borderRadius: 4,
                     fontWeight: 500,
                     background:
-                      a.status === "done"
+                      agent.status === "done"
                         ? "rgba(192,167,255,0.1)"
-                        : a.status === "active"
+                        : agent.status === "active"
                           ? "rgba(208,188,255,0.15)"
                           : "rgba(255,255,255,0.03)",
-                    color: a.status === "done" ? "var(--teal)" : a.status === "active" ? "var(--accent)" : "var(--text3)",
+                    color:
+                      agent.status === "done" ? "var(--teal)" : agent.status === "active" ? "var(--accent)" : "var(--text3)",
                   }}
                 >
-                  {a.status === "done" ? "DONE" : a.status === "active" ? "RUNNING" : "WAITING"}
+                  {agent.status === "done" ? "DONE" : agent.status === "active" ? "RUNNING" : "WAITING"}
                 </span>
-              </motion.div>
+              </Motion.div>
             ))}
           </div>
         </GlowCard>
       )}
-    </motion.div>
+    </Motion.div>
   );
 }
