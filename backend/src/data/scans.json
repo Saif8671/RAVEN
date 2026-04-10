@@ -1,0 +1,21 @@
+[
+  {
+    "id": "689fe463-a822-403f-9e8a-593cccadb3fd",
+    "domain": "example.com",
+    "score": 65,
+    "findings": [
+      {
+        "type": "SSL",
+        "severity": "HIGH",
+        "message": "SSL Connection failed: unable to get local issuer certificate"
+      },
+      {
+        "type": "HTTP",
+        "severity": "MEDIUM",
+        "message": "Could not analyze headers: unable to get local issuer certificate"
+      }
+    ],
+    "timestamp": "2026-04-10T16:29:42.190Z",
+    "businessName": "Example Corp"
+  }
+]
