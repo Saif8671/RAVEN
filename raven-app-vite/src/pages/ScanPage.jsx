@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
 import { runFullScan } from "../lib/api";
+import { PAGES } from "../lib/pages";
+import { isValidDomain, isValidEmail, normalizeInput } from "../lib/validation";
 
 const LOADING_STEPS = [
   "Checking SSL...",
@@ -48,13 +50,8 @@ export function ScanPage({ setPage, setReport }) {
   }, [isSubmitting]);
 
   const validate = () => {
-    const domain = form.domain.trim().toLowerCase();
-    const email = form.email.trim().toLowerCase();
-    const domainPattern = /^[a-z0-9.-]+\.[a-z]{2,}$/i;
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!domainPattern.test(domain)) return "Please enter a valid domain, like example.com.";
-    if (!emailPattern.test(email)) return "Please enter a valid business email address.";
+    if (!isValidDomain(form.domain)) return "Please enter a valid domain, like example.com.";
+    if (!isValidEmail(form.email)) return "Please enter a valid business email address.";
     return null;
   };
 
@@ -72,10 +69,10 @@ export function ScanPage({ setPage, setReport }) {
 
     try {
       const payload = {
-        domain: form.domain.trim().toLowerCase(),
-        email: form.email.trim().toLowerCase(),
-        business_name: form.business_name.trim(),
-        website_url: form.website_url.trim(),
+        domain: normalizeInput(form.domain),
+        email: normalizeInput(form.email),
+        business_name: String(form.business_name || "").trim(),
+        website_url: String(form.website_url || "").trim(),
       };
 
       const progressText = ["Checking SSL...", "Scanning email security...", "Checking breach databases...", "Running AI analysis..."];
@@ -93,7 +90,7 @@ export function ScanPage({ setPage, setReport }) {
         setReport(data.report);
       }
 
-      setPage("results");
+      setPage(PAGES.RESULTS);
     } catch (error) {
       setStep("form");
       setErrorText(error?.message || "Failed to run scan.");

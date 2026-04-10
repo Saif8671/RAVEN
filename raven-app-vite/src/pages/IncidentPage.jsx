@@ -1,5 +1,6 @@
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
+import { PAGES } from "../lib/pages";
 
 export function IncidentPage({ setPage, report }) {
   const playbookSteps = report?.aiGuide?.incidentPlaybook || [];
@@ -88,10 +89,10 @@ export function IncidentPage({ setPage, report }) {
       </div>
 
       <div style={{ marginTop: 64, display: "flex", gap: 24 }}>
-        <button className="btn-primary" onClick={() => setPage("scan")}>
+        <button className="btn-primary" onClick={() => setPage(PAGES.SCAN)}>
           Run Compromise Scan
         </button>
-        <button className="btn-ghost" onClick={() => setPage("home")}>
+        <button className="btn-ghost" onClick={() => setPage(PAGES.HOME)}>
           Cancel
         </button>
       </div>

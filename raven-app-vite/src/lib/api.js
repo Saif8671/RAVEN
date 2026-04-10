@@ -3,18 +3,21 @@ function getApiBaseUrl() {
   return baseUrl.replace(/\/+$/, "");
 }
 
-async function request(path, payload) {
+async function request(path, payload, method = "POST") {
   const apiBaseUrl = getApiBaseUrl();
   let response;
 
   try {
-    response = await fetch(`${apiBaseUrl}${path}`, {
-      method: "POST",
+    const options = {
+      method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
-    });
+    };
+    if (method !== "GET" && payload) {
+      options.body = JSON.stringify(payload);
+    }
+    response = await fetch(`${apiBaseUrl}${path}`, options);
   } catch {
     throw new Error(`Unable to reach the scan backend at ${apiBaseUrl}.`);
   }
@@ -34,6 +37,14 @@ export async function runFullScan(payload) {
 
 export async function sendReportEmail(payload) {
   return request("/report/email", payload);
+}
+
+export async function fetchReports() {
+  return request("/reports", null, "GET");
+}
+
+export async function fetchReport(reportId) {
+  return request(`/report/${reportId}`, null, "GET");
 }
 
 export async function runScan(payload) {

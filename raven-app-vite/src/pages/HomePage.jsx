@@ -1,6 +1,7 @@
 import { motion as Motion } from "framer-motion";
 import { Ticker } from "../components/Ticker";
 import { GlowCard } from "../components/GlowCard";
+import { PAGES } from "../lib/pages";
 
 export function HomePage({ setPage }) {
   const crisisStats = [
@@ -68,7 +69,7 @@ export function HomePage({ setPage }) {
             It scans, explains, fixes, monitors, and educates, so security becomes an ongoing service instead of a one-off report.
           </Motion.p>
           <Motion.div variants={item} className="home-hero__actions">
-            <button className="btn-primary" onClick={() => setPage("scan")}>
+            <button className="btn-primary" onClick={() => setPage(PAGES.SCAN)}>
               Scan Your Business Free {"->"}
             </button>
           </Motion.div>

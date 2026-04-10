@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { FindingCard } from "../components/FindingCard";
 import { sendReportEmail } from "../lib/api";
+import { PAGES } from "../lib/pages";
 
 function severityLabel(score) {
   if (score >= 80) return "GOOD";
@@ -71,7 +72,7 @@ export function ResultsPage({ setPage, report }) {
           <p style={{ color: "var(--text2)", lineHeight: 1.7, marginBottom: 32 }}>
             Start a scan to load live results from the backend.
           </p>
-          <button className="btn-primary" onClick={() => setPage("scan")}>
+          <button className="btn-primary" onClick={() => setPage(PAGES.SCAN)}>
             Start Security Scan -&gt;
           </button>
         </div>
@@ -89,7 +90,7 @@ export function ResultsPage({ setPage, report }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      style={{ padding: "140px 80px 80px", maxWidth: 1200, margin: "0 auto" }}
+      style={{ padding: "140px 80px 80px", maxWidth: 1200, margin: "0 auto", minHeight: "100vh" }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 32, marginBottom: 48 }}>
         <div>
@@ -135,6 +136,21 @@ export function ResultsPage({ setPage, report }) {
           <div style={{ color: "var(--text2)", marginTop: 8 }}>{severityLabel(activeReport.score)} band</div>
         </div>
       </div>
+
+      {activeReport.scanMeta && (
+        <div style={{
+          display: "flex", gap: 32, marginBottom: 32, padding: "16px 24px",
+          borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border2)",
+          fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text3)",
+          flexWrap: "wrap",
+        }}>
+          <span>Scanned: {new Date(activeReport.scannedAt).toLocaleString()}</span>
+          <span>Duration: {activeReport.scanMeta.durationSec}s</span>
+          <span>Vuln: {activeReport.scanMeta.vulnScan?.status}</span>
+          <span>Email: {activeReport.scanMeta.emailScan?.status}</span>
+          <span>Breach: {activeReport.scanMeta.breachScan?.status}</span>
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 48 }}>
         {[
@@ -293,9 +309,15 @@ export function ResultsPage({ setPage, report }) {
         )}
       </div>
 
-      <div style={{ marginTop: 32 }}>
-        <button className="btn-ghost" onClick={() => setPage("scan")}>
+      <div style={{ marginTop: 32, display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <button className="btn-primary" onClick={() => setPage(PAGES.INCIDENT)}>
+          View Incident Response Playbook
+        </button>
+        <button className="btn-ghost" onClick={() => setPage(PAGES.SCAN)}>
           Run another scan
+        </button>
+        <button className="btn-ghost" onClick={() => setPage(PAGES.HISTORY)}>
+          View scan history
         </button>
       </div>
     </Motion.div>

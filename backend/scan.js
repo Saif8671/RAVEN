@@ -8,6 +8,8 @@ const { getAIFixGuide, buildFallbackGuide } = require("./aiFixGuide");
 const router = express.Router();
 const reports = new Map();
 
+const SCAN_TIMEOUT_MS = 30000;
+
 function normalizeDomain(domain) {
   return String(domain || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
 }
@@ -83,8 +85,32 @@ function buildSupervityAnalysis({ domain, score, band, findings, vulnerability, 
   };
 }
 
+/**
+ * Wrap a scan function in a timeout so one slow/broken scan
+ * cannot prevent the rest of the report from being built.
+ */
+function withTimeout(scanFn, label) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      resolve({ _failed: true, _error: `${label} timed out after ${SCAN_TIMEOUT_MS / 1000}s` });
+    }, SCAN_TIMEOUT_MS);
+
+    scanFn
+      .then((result) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        resolve({ _failed: true, _error: error.message || String(error) });
+      });
+  });
+}
+
+// ─── Scan routes: /api/scan/* ───────────────────────────────
+
 // POST /api/scan/vulnerability
-router.post("/vulnerability", async (req, res) => {
+router.post("/scan/vulnerability", async (req, res) => {
   try {
     const domain = normalizeDomain(req.body.domain);
     if (!domain) return res.status(400).json({ error: "Domain is required" });
@@ -96,7 +122,7 @@ router.post("/vulnerability", async (req, res) => {
 });
 
 // POST /api/scan/email
-router.post("/email", async (req, res) => {
+router.post("/scan/email", async (req, res) => {
   try {
     const domain = normalizeDomain(req.body.domain);
     if (!domain) return res.status(400).json({ error: "Domain is required" });
@@ -108,7 +134,7 @@ router.post("/email", async (req, res) => {
 });
 
 // POST /api/scan/breach
-router.post("/breach", async (req, res) => {
+router.post("/scan/breach", async (req, res) => {
   try {
     const email = String(req.body.email || "").trim().toLowerCase();
     if (!email) return res.status(400).json({ error: "Email is required" });
@@ -119,8 +145,8 @@ router.post("/breach", async (req, res) => {
   }
 });
 
-// POST /api/scan/full
-router.post("/full", async (req, res) => {
+// POST /api/scan/full — the main endpoint the frontend uses
+router.post("/scan/full", async (req, res) => {
   try {
     const domain = normalizeDomain(req.body.domain || req.body.website_url || req.body.email_domain);
     const email = String(req.body.email || req.body.owner_email || "").trim().toLowerCase();
@@ -129,13 +155,32 @@ router.post("/full", async (req, res) => {
       return res.status(400).json({ error: "Domain and email are required" });
     }
 
+    const startTime = Date.now();
+
+    // Run all three scans in parallel with individual timeouts
     const [vulnerability, emailSecurity, breach] = await Promise.all([
-      scanVulnerability(domain),
-      scanEmail(domain),
-      scanBreach(email),
+      withTimeout(scanVulnerability(domain), "Vulnerability scan"),
+      withTimeout(scanEmail(domain), "Email scan"),
+      withTimeout(scanBreach(email), "Breach scan"),
     ]);
 
-    const scoreBundle = calculateScore({ vulnerability, email: emailSecurity, breach });
+    const scanDurationMs = Date.now() - startTime;
+
+    // Build scan metadata showing what succeeded and what failed
+    const scanMeta = {
+      durationMs: scanDurationMs,
+      durationSec: Math.round(scanDurationMs / 1000),
+      vulnScan: vulnerability._failed ? { status: "failed", error: vulnerability._error } : { status: "ok" },
+      emailScan: emailSecurity._failed ? { status: "failed", error: emailSecurity._error } : { status: "ok" },
+      breachScan: breach._failed ? { status: "failed", error: breach._error } : { status: "ok" },
+    };
+
+    // Use empty defaults for failed scans so scorer doesn't crash
+    const safeVuln = vulnerability._failed ? {} : vulnerability;
+    const safeEmail = emailSecurity._failed ? {} : emailSecurity;
+    const safeBreach = breach._failed ? { breached: null, count: 0 } : breach;
+
+    const scoreBundle = calculateScore({ vulnerability: safeVuln, email: safeEmail, breach: safeBreach });
     const aiGuide = await getAIFixGuide(scoreBundle.findings, domain);
 
     const reportId = createReportId(domain);
@@ -146,13 +191,14 @@ router.post("/full", async (req, res) => {
       business_name: req.body.business_name || domain,
       website_url: req.body.website_url || `https://${domain}`,
       scannedAt: new Date().toISOString(),
+      scanMeta,
       score: scoreBundle.score,
       band: scoreBundle.band,
       deductions: scoreBundle.deductions,
       totalIssues: scoreBundle.totalIssues,
       findings: scoreBundle.findings,
       counts: scoreBundle.counts,
-      scanResults: { vulnerability, email: emailSecurity, breach },
+      scanResults: { vulnerability: safeVuln, email: safeEmail, breach: safeBreach },
       aiGuide,
       attackStory: buildAttackNarrative(domain, scoreBundle.findings, aiGuide),
       summary_message: buildBusinessSummary(domain, scoreBundle.score, scoreBundle.band, scoreBundle.findings),
@@ -168,16 +214,19 @@ router.post("/full", async (req, res) => {
         score: scoreBundle.score,
         band: scoreBundle.band,
         findings: scoreBundle.findings,
-        vulnerability,
-        emailSecurity,
-        breach,
+        vulnerability: safeVuln,
+        emailSecurity: safeEmail,
+        breach: safeBreach,
         aiGuide,
       }),
     });
   } catch (error) {
+    console.error("Full scan error:", error);
     res.status(500).json({ error: error.message });
   }
 });
+
+// ─── Supervity routes: /api/supervity/* ─────────────────────
 
 // POST /api/supervity/analyze
 router.post("/supervity/analyze", async (req, res) => {
@@ -206,6 +255,8 @@ router.post("/supervity/analyze", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// ─── Report routes: /api/report/* ───────────────────────────
 
 // POST /api/report/email
 router.post("/report/email", async (req, res) => {
@@ -240,6 +291,21 @@ router.get("/report/:id", (req, res) => {
   const report = reports.get(req.params.id);
   if (!report) return res.status(404).json({ error: "Report not found" });
   res.json({ status: "ok", report });
+});
+
+// GET /api/reports — list all saved reports (for history page)
+router.get("/reports", (_req, res) => {
+  const all = Array.from(reports.values()).map((r) => ({
+    id: r.id,
+    domain: r.domain,
+    business_name: r.business_name,
+    score: r.score,
+    band: r.band,
+    totalIssues: r.totalIssues,
+    scannedAt: r.scannedAt,
+  }));
+  all.sort((a, b) => new Date(b.scannedAt) - new Date(a.scannedAt));
+  res.json({ status: "ok", reports: all });
 });
 
 module.exports = router;

@@ -5,26 +5,43 @@ import { AnimatePresence } from "framer-motion";
 import { Nav } from "./components/Nav";
 
 // Pages
+import { PAGES } from "./lib/pages";
 import { HomePage } from "./pages/HomePage";
 import { ScanPage } from "./pages/ScanPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { IncidentPage } from "./pages/IncidentPage";
+import { HistoryPage } from "./pages/HistoryPage";
 
 import "./styles/global.css";
 
 export default function App() {
-  const [page, setPage] = useState("home"); // home, scan, results, incident
+  const [page, setPage] = useState(PAGES.HOME);
   const [report, setReport] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const handleSetReport = (newReport) => {
+    setReport(newReport);
+    if (newReport && newReport.id) {
+      setHistory((prev) => {
+        const exists = prev.some((r) => r.id === newReport.id);
+        if (exists) return prev;
+        return [newReport, ...prev];
+      });
+    }
+  };
+
+  const pageComponents = {
+    [PAGES.HOME]: <HomePage key={PAGES.HOME} setPage={setPage} />,
+    [PAGES.SCAN]: <ScanPage key={PAGES.SCAN} setPage={setPage} setReport={handleSetReport} />,
+    [PAGES.RESULTS]: <ResultsPage key={PAGES.RESULTS} setPage={setPage} report={report} />,
+    [PAGES.INCIDENT]: <IncidentPage key={PAGES.INCIDENT} setPage={setPage} report={report} />,
+    [PAGES.HISTORY]: <HistoryPage key={PAGES.HISTORY} setPage={setPage} setReport={handleSetReport} reports={history} />,
+  };
 
   return (
     <>
       <Nav page={page} setPage={setPage} />
-      <AnimatePresence mode="wait">
-        {page === "home" && <HomePage key="home" setPage={setPage} />}
-        {page === "scan" && <ScanPage key="scan" setPage={setPage} setReport={setReport} />}
-        {page === "results" && <ResultsPage key="results" setPage={setPage} report={report} />}
-        {page === "incident" && <IncidentPage key="incident" setPage={setPage} report={report} />}
-      </AnimatePresence>
+      <AnimatePresence mode="wait">{pageComponents[page]}</AnimatePresence>
     </>
   );
 }
