@@ -1,8 +1,41 @@
+import { useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { FindingCard } from "../components/FindingCard";
+import { sendReportEmail } from "../lib/api";
+
+function severityLabel(score) {
+  if (score >= 80) return "GOOD";
+  if (score >= 60) return "FAIR";
+  if (score >= 40) return "POOR";
+  return "CRITICAL";
+}
 
 export function ResultsPage({ setPage, report }) {
+  const [emailRecipient, setEmailRecipient] = useState(report?.email || "");
+  const [emailStatus, setEmailStatus] = useState("");
+  const [emailError, setEmailError] = useState("");
+
   const activeReport = report;
+
+  const sendEmail = async () => {
+    if (!activeReport?.id) {
+      setEmailError("No report is available to send.");
+      return;
+    }
+
+    try {
+      setEmailError("");
+      setEmailStatus("Sending report...");
+      const response = await sendReportEmail({
+        reportId: activeReport.id,
+        recipientEmail: emailRecipient,
+      });
+      setEmailStatus(response.message || `Report sent to ${emailRecipient}.`);
+    } catch (error) {
+      setEmailStatus("");
+      setEmailError(error?.message || "Failed to send report.");
+    }
+  };
 
   if (!activeReport) {
     return (
@@ -36,15 +69,20 @@ export function ResultsPage({ setPage, report }) {
             Run a scan to generate results
           </h1>
           <p style={{ color: "var(--text2)", lineHeight: 1.7, marginBottom: 32 }}>
-            RAVEN no longer ships with a built-in sample report. Start a scan to load live results from the backend.
+            Start a scan to load live results from the backend.
           </p>
           <button className="btn-primary" onClick={() => setPage("scan")}>
-            Start Security Scan {"->"}
+            Start Security Scan -&gt;
           </button>
         </div>
       </Motion.div>
     );
   }
+
+  const findings = Array.isArray(activeReport.findings) ? activeReport.findings : [];
+  const quickWins = activeReport.aiGuide?.quickWins || [];
+  const fixes = activeReport.aiGuide?.fixes || [];
+  const incidentPlaybook = activeReport.aiGuide?.incidentPlaybook || [];
 
   return (
     <Motion.div
@@ -53,12 +91,12 @@ export function ResultsPage({ setPage, report }) {
       exit={{ opacity: 0 }}
       style={{ padding: "140px 80px 80px", maxWidth: 1200, margin: "0 auto" }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 32, marginBottom: 48 }}>
         <div>
           <div className="section-label" style={{ marginBottom: 16 }}>
             Scan Complete
           </div>
-          <h1 style={{ fontFamily: "var(--font-head)", fontSize: 48, fontWeight: 700 }}>{activeReport.business_name}</h1>
+          <h1 style={{ fontFamily: "var(--font-head)", fontSize: 48, fontWeight: 700 }}>{activeReport.business_name || activeReport.domain}</h1>
           <a
             href={activeReport.website_url}
             target="_blank"
@@ -79,7 +117,7 @@ export function ResultsPage({ setPage, report }) {
               marginBottom: 8,
             }}
           >
-            Vulnerability Score
+            Security Score
           </div>
           <div
             style={{
@@ -87,28 +125,29 @@ export function ResultsPage({ setPage, report }) {
               fontSize: 80,
               fontWeight: 800,
               lineHeight: 0.8,
-              color: "var(--threat)",
-              textShadow: "0 0 40px rgba(255, 180, 171, 0.4)",
+              color: activeReport.band === "GOOD" ? "var(--teal)" : activeReport.band === "FAIR" ? "var(--gold)" : "var(--threat)",
+              textShadow: "0 0 40px rgba(255, 180, 171, 0.25)",
             }}
           >
-            {activeReport.risk_score ?? "—"}
+            {activeReport.score ?? "N/A"}
             <span style={{ fontSize: 24, color: "var(--text3)", textShadow: "none" }}>/100</span>
           </div>
+          <div style={{ color: "var(--text2)", marginTop: 8 }}>{severityLabel(activeReport.score)} band</div>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 64 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 48 }}>
         {[
-          { label: "Critical", count: activeReport.critical_count ?? 0, color: "var(--threat)" },
-          { label: "High", count: activeReport.high_count ?? 0, color: "#ffcc99" },
-          { label: "Medium", count: activeReport.medium_count ?? 0, color: "#fce8b2" },
-          { label: "Low", count: activeReport.low_count ?? 0, color: "var(--teal)" },
-        ].map((stat, i) => (
+          { label: "Critical", count: activeReport.counts?.criticalCount ?? 0, color: "var(--threat)" },
+          { label: "High", count: activeReport.counts?.highCount ?? 0, color: "#ffcc99" },
+          { label: "Medium", count: activeReport.counts?.mediumCount ?? 0, color: "#fce8b2" },
+          { label: "Low", count: activeReport.counts?.lowCount ?? 0, color: "var(--teal)" },
+        ].map((stat, index) => (
           <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + i * 0.1 }}
-            key={i}
+            transition={{ delay: 0.1 + index * 0.05 }}
+            key={stat.label}
             style={{
               background: "var(--surface2)",
               padding: "32px 24px",
@@ -126,52 +165,44 @@ export function ResultsPage({ setPage, report }) {
         ))}
       </div>
 
-      {activeReport.breach_detected && (
-        <Motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{
-            background: "rgba(255, 180, 171, 0.1)",
-            border: "1px solid rgba(255, 180, 171, 0.3)",
-            borderRadius: 8,
-            padding: 32,
-            marginBottom: 64,
-            display: "flex",
-            gap: 32,
-            alignItems: "flex-start",
-          }}
-        >
-          <div style={{ fontSize: 40 }}>[!]</div>
-          <div>
-            <h3 style={{ fontFamily: "var(--font-head)", fontSize: 20, fontWeight: 700, color: "var(--threat)", marginBottom: 12 }}>
-              Breach Detected: Password exposure likely
-            </h3>
-            <p style={{ color: "var(--text2)", lineHeight: 1.6, marginBottom: 24, maxWidth: 800 }}>
-              {activeReport.breach_details || "No breach details were returned by the backend."}
-            </p>
-            <button className="btn-primary" style={{ background: "var(--threat)", color: "#3e0000" }} onClick={() => setPage("incident")}>
-              View Incident Playbook {"->"}
-            </button>
-          </div>
-        </Motion.div>
-      )}
-
-      <div style={{ marginBottom: 64, maxWidth: 800 }}>
-        <h2 style={{ fontFamily: "var(--font-head)", fontSize: 28, fontWeight: 600, marginBottom: 24 }}>Plain-English Summary</h2>
-        <p style={{ fontSize: 18, color: "var(--text)", lineHeight: 1.7, fontWeight: 300 }}>
-          {activeReport.summary_message || "No summary was returned by the backend."}
-        </p>
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 32, marginBottom: 48 }}>
+        <div>
+          <h2 style={{ fontFamily: "var(--font-head)", fontSize: 28, fontWeight: 600, marginBottom: 20 }}>Plain-English Summary</h2>
+          <p style={{ fontSize: 18, color: "var(--text)", lineHeight: 1.7, fontWeight: 300 }}>{activeReport.summary_message}</p>
+        </div>
+        <div style={{ background: "var(--surface2)", borderRadius: 12, padding: 24, border: "1px solid var(--border2)" }}>
+          <div className="section-label">Quick Wins</div>
+          {quickWins.length ? (
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {quickWins.map((item) => (
+                <li key={item} style={{ marginBottom: 12, color: "var(--text2)" }}>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div style={{ color: "var(--text2)" }}>No quick wins returned yet.</div>
+          )}
+        </div>
       </div>
 
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "1px solid var(--border2)", paddingBottom: 24, marginBottom: 32 }}>
-          <h2 style={{ fontFamily: "var(--font-head)", fontSize: 24, fontWeight: 600 }}>Action Items ({activeReport.total_issues})</h2>
-          <span style={{ color: "var(--text3)", fontFamily: "var(--font-mono)", fontSize: 13 }}>Sorted by priority</span>
+      <div style={{ marginBottom: 48 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            borderBottom: "1px solid var(--border2)",
+            paddingBottom: 24,
+            marginBottom: 32,
+          }}
+        >
+          <h2 style={{ fontFamily: "var(--font-head)", fontSize: 24, fontWeight: 600 }}>Action Items ({activeReport.totalIssues ?? findings.length})</h2>
+          <span style={{ color: "var(--text3)", fontFamily: "var(--font-mono)", fontSize: 13 }}>Sorted by severity</span>
         </div>
 
-        {Array.isArray(activeReport.findings) && activeReport.findings.length > 0 ? (
-          activeReport.findings.map((f, i) => <FindingCard key={f.id} f={f} idx={i} />)
+        {findings.length ? (
+          findings.map((finding, index) => <FindingCard key={finding.id} f={finding} idx={index} />)
         ) : (
           <div
             style={{
@@ -185,6 +216,87 @@ export function ResultsPage({ setPage, report }) {
             No findings were returned for this scan.
           </div>
         )}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginBottom: 48 }}>
+        <div style={{ background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 12, padding: 24 }}>
+          <h2 style={{ fontFamily: "var(--font-head)", fontSize: 24, marginBottom: 16 }}>Fix Guide</h2>
+          {fixes.length ? (
+            fixes.map((fix) => (
+              <div key={fix.issue} style={{ marginBottom: 20 }}>
+                <div style={{ fontFamily: "var(--font-head)", fontSize: 18, marginBottom: 8 }}>{fix.issue}</div>
+                <div style={{ color: "var(--text2)", marginBottom: 8 }}>{fix.plainEnglish}</div>
+                {Array.isArray(fix.steps) && (
+                  <ol style={{ paddingLeft: 20, color: "var(--text2)" }}>
+                    {fix.steps.map((step) => (
+                      <li key={step} style={{ marginBottom: 6 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {fix.codeSnippet ? (
+                  <pre style={{ marginTop: 12, padding: 14, borderRadius: 8, background: "var(--bg2)", overflowX: "auto", color: "var(--text3)" }}>
+                    <code>{fix.codeSnippet}</code>
+                  </pre>
+                ) : null}
+              </div>
+            ))
+          ) : (
+            <div style={{ color: "var(--text2)" }}>No fix guide returned.</div>
+          )}
+        </div>
+
+        <div style={{ background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 12, padding: 24 }}>
+          <h2 style={{ fontFamily: "var(--font-head)", fontSize: 24, marginBottom: 16 }}>Attack Narrative</h2>
+          <p style={{ color: "var(--text2)", lineHeight: 1.7, marginBottom: 20 }}>{activeReport.attackStory || activeReport.aiGuide?.attackStory}</p>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text3)", marginBottom: 8 }}>
+            Incident Playbook
+          </div>
+          {incidentPlaybook.length ? (
+            <ol style={{ paddingLeft: 20, color: "var(--text2)" }}>
+              {incidentPlaybook.map((item) => (
+                <li key={item} style={{ marginBottom: 8 }}>
+                  {item}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div style={{ color: "var(--text2)" }}>No incident playbook returned.</div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ background: "rgba(255, 180, 171, 0.08)", border: "1px solid rgba(255, 180, 171, 0.2)", borderRadius: 12, padding: 24 }}>
+        <h2 style={{ fontFamily: "var(--font-head)", fontSize: 24, marginBottom: 12 }}>Email Report</h2>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <input
+            value={emailRecipient}
+            onChange={(event) => setEmailRecipient(event.target.value)}
+            placeholder="owner@business.com"
+            style={{
+              minWidth: 280,
+              flex: 1,
+              padding: "14px 16px",
+              borderRadius: 8,
+              border: "1px solid var(--border2)",
+              background: "var(--surface2)",
+              color: "var(--text)",
+            }}
+          />
+          <button className="btn-primary" onClick={sendEmail}>
+            Email me this report
+          </button>
+        </div>
+        {(emailStatus || emailError) && (
+          <div style={{ marginTop: 12, color: emailError ? "var(--threat)" : "var(--text2)" }}>{emailError || emailStatus}</div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 32 }}>
+        <button className="btn-ghost" onClick={() => setPage("scan")}>
+          Run another scan
+        </button>
       </div>
     </Motion.div>
   );

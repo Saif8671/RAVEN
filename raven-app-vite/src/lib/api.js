@@ -1,14 +1,14 @@
 function getApiBaseUrl() {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || "/api";
+  const baseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "/api";
   return baseUrl.replace(/\/+$/, "");
 }
 
-export async function runScan(payload) {
+async function request(path, payload) {
   const apiBaseUrl = getApiBaseUrl();
   let response;
 
   try {
-    response = await fetch(`${apiBaseUrl}/scan`, {
+    response = await fetch(`${apiBaseUrl}${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -22,8 +22,21 @@ export async function runScan(payload) {
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data?.error || `Scan failed with status ${response.status}`);
+    throw new Error(data?.error || `Request failed with status ${response.status}`);
   }
 
   return data;
+}
+
+export async function runFullScan(payload) {
+  return request("/scan/full", payload);
+}
+
+export async function sendReportEmail(payload) {
+  return request("/report/email", payload);
+}
+
+export async function runScan(payload) {
+  const result = await runFullScan(payload);
+  return result.report;
 }

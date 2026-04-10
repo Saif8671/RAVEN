@@ -33,4 +33,7 @@ Optional environment variables for the backend:
 - `SUPERVITY_API_URL`
 - `ALLOWED_ORIGINS`
 
-If those Supervity credentials are missing, the backend returns a local fallback report so the UI still works during development.
+`backend/server.js` will read these from `backend/.env`, `backend/.env.local`, or the repo root `.env.local` if present.
+For a Next.js API route, keep them in the Next project root `.env.local` instead.
+
+If those Supervity credentials are missing, the backend returns a configuration error instead of a fabricated report. That keeps the frontend honest and makes it obvious when the live workflow is not connected.

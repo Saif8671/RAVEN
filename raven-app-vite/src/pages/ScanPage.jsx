@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
-import { runScan } from "../lib/api";
+import { runFullScan } from "../lib/api";
 
-const AGENT_TEMPLATE = [
-  "Input Classifier",
-  "Web Vulnerability Scanner",
-  "Email Security Agent",
-  "Breach Detection Agent",
-  "Risk Scorer",
-  "Plain English Translator",
-  "Fix Guide Generator",
-  "Report Compiler & Dispatcher",
+const LOADING_STEPS = [
+  "Checking SSL...",
+  "Scanning email security...",
+  "Checking breach databases...",
+  "Running AI analysis...",
+  "Building your report...",
 ];
 
 export function ScanPage({ setPage, setReport }) {
@@ -19,78 +16,88 @@ export function ScanPage({ setPage, setReport }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusText, setStatusText] = useState("");
   const [errorText, setErrorText] = useState("");
+  const [progressIndex, setProgressIndex] = useState(0);
+  const progressTimer = useRef(null);
   const [form, setForm] = useState({
+    domain: "",
+    email: "",
     business_name: "",
     website_url: "",
-    email_domain: "",
-    owner_email: "",
   });
-  const [agentStates, setAgentStates] = useState(
-    AGENT_TEMPLATE.map((name) => ({ name, status: "pending" }))
-  );
-  const timerRefs = useRef([]);
 
   useEffect(() => {
+    if (!isSubmitting) {
+      if (progressTimer.current) {
+        clearInterval(progressTimer.current);
+        progressTimer.current = null;
+      }
+      return;
+    }
+
+    setProgressIndex(0);
+    progressTimer.current = setInterval(() => {
+      setProgressIndex((current) => Math.min(current + 1, LOADING_STEPS.length - 1));
+    }, 7000);
+
     return () => {
-      timerRefs.current.forEach(clearTimeout);
-      timerRefs.current = [];
+      if (progressTimer.current) {
+        clearInterval(progressTimer.current);
+        progressTimer.current = null;
+      }
     };
-  }, []);
+  }, [isSubmitting]);
 
-  const sleep = (ms) =>
-    new Promise((resolve) => {
-      const id = setTimeout(resolve, ms);
-      timerRefs.current.push(id);
-    });
+  const validate = () => {
+    const domain = form.domain.trim().toLowerCase();
+    const email = form.email.trim().toLowerCase();
+    const domainPattern = /^[a-z0-9.-]+\.[a-z]{2,}$/i;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const resetTimers = () => {
-    timerRefs.current.forEach(clearTimeout);
-    timerRefs.current = [];
+    if (!domainPattern.test(domain)) return "Please enter a valid domain, like example.com.";
+    if (!emailPattern.test(email)) return "Please enter a valid business email address.";
+    return null;
   };
 
   const startScan = async () => {
-    if (!form.business_name || !form.website_url || !form.email_domain || !form.owner_email) {
-      setErrorText("Please fill in all four fields before starting the scan.");
+    const validationError = validate();
+    if (validationError) {
+      setErrorText(validationError);
       return;
     }
 
     setIsSubmitting(true);
-    resetTimers();
     setStep("scanning");
     setErrorText("");
-    setStatusText("Connecting to the scan backend...");
-    setAgentStates(AGENT_TEMPLATE.map((name) => ({ name, status: "pending" })));
+    setStatusText(LOADING_STEPS[0]);
 
     try {
-      const scanPromise = runScan(form);
-      const delays = [400, 600, 700, 800, 1200, 900, 800, 700];
+      const payload = {
+        domain: form.domain.trim().toLowerCase(),
+        email: form.email.trim().toLowerCase(),
+        business_name: form.business_name.trim(),
+        website_url: form.website_url.trim(),
+      };
 
-      for (let i = 0; i < AGENT_TEMPLATE.length; i += 1) {
-        await sleep(delays[i]);
-        setAgentStates((prev) =>
-          prev.map((agent, index) => ({
-            ...agent,
-            status: index < i ? "done" : index === i ? "active" : "pending",
-          }))
-        );
-        setStatusText(`Running ${AGENT_TEMPLATE[i].toLowerCase()}...`);
+      const progressText = ["Checking SSL...", "Scanning email security...", "Checking breach databases...", "Running AI analysis..."];
+      for (let i = 0; i < progressText.length; i += 1) {
+        setStatusText(progressText[i]);
+        if (i < progressText.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 250));
+        }
       }
 
-      const report = await scanPromise;
-      setStatusText("Backend response received. Compiling the report...");
-      setAgentStates((prev) => prev.map((agent) => ({ ...agent, status: "done" })));
+      const data = await runFullScan(payload);
+      setStatusText("Report ready.");
 
       if (typeof setReport === "function") {
-        setReport(report);
+        setReport(data.report);
       }
 
-      const doneId = setTimeout(() => setPage("results"), 750);
-      timerRefs.current.push(doneId);
+      setPage("results");
     } catch (error) {
       setStep("form");
       setErrorText(error?.message || "Failed to run scan.");
       setStatusText("");
-      setAgentStates(AGENT_TEMPLATE.map((name) => ({ name, status: "pending" })));
     } finally {
       setIsSubmitting(false);
     }
@@ -102,9 +109,9 @@ export function ScanPage({ setPage, setReport }) {
         <div className="section-label" style={{ justifyContent: "center" }}>
           Security Audit
         </div>
-        <h1 className="scan-title">Protect your business in one sweep.</h1>
+        <h1 className="scan-title">Find the weak spots before attackers do.</h1>
         <p className="scan-subtitle">
-          Share a few details and RAVEN will map out your web, email, and account exposure in under 60 seconds.
+          Enter your domain and business email. RAVEN will run a fast public-surface check and return a plain-English risk report.
         </p>
       </div>
 
@@ -114,19 +121,19 @@ export function ScanPage({ setPage, setReport }) {
             <div className="scan-panel__header">
               <div>
                 <div className="scan-panel__eyebrow">Business Intake</div>
-                <h2 className="scan-panel__title">Tell us who to protect</h2>
+                <h2 className="scan-panel__title">Tell us what to scan</h2>
               </div>
               <p className="scan-panel__note">
-                The scan uses these details to check your public site, email domain, and owner account footprint.
+                We use your domain to check SSL, headers, exposed paths, and email protections. The email is used for breach lookup.
               </p>
             </div>
 
             <div className="scan-form-grid">
               {[
+                { label: "Domain", key: "domain", placeholder: "northstarfoods.com" },
+                { label: "Business Email", key: "email", placeholder: "owner@northstarfoods.com" },
                 { label: "Business Name", key: "business_name", placeholder: "Northstar Foods" },
                 { label: "Website URL", key: "website_url", placeholder: "https://northstarfoods.com" },
-                { label: "Email Domain", key: "email_domain", placeholder: "northstarfoods.com" },
-                { label: "Owner Email", key: "owner_email", placeholder: "owner@northstarfoods.com" },
               ].map(({ label, key, placeholder }) => (
                 <div className="scan-field" key={key}>
                   <label className="scan-field__label" htmlFor={key}>
@@ -135,20 +142,22 @@ export function ScanPage({ setPage, setReport }) {
                   <input
                     id={key}
                     value={form[key]}
-                    onChange={(e) => setForm((current) => ({ ...current, [key]: e.target.value }))}
+                    onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))}
                     placeholder={placeholder}
                     className="scan-field__input"
+                    autoComplete="off"
                   />
                 </div>
               ))}
             </div>
 
             <div className="scan-panel__footer">
-              <p className="scan-panel__helper">Press start when ready. We will move straight into the scan flow.</p>
+              <p className="scan-panel__helper">The scan usually takes under 90 seconds, depending on public DNS and site response time.</p>
               <button className="btn-primary scan-cta" onClick={startScan} disabled={isSubmitting}>
-                {isSubmitting ? "Connecting..." : "Start Security Scan ->"}
+                {isSubmitting ? "Scanning..." : "Start Security Scan ->"}
               </button>
             </div>
+
             {(statusText || errorText) && (
               <div
                 role="status"
@@ -173,11 +182,19 @@ export function ScanPage({ setPage, setReport }) {
 
       {step === "scanning" && (
         <GlowCard style={{ width: "100%", maxWidth: 680, padding: "64px 48px", textAlign: "center" }}>
+          <div style={{ marginBottom: 36 }}>
+            <div className="section-label" style={{ justifyContent: "center" }}>
+              Live scan
+            </div>
+            <h2 style={{ fontFamily: "var(--font-head)", fontSize: 34, marginBottom: 8 }}>Running your security checks</h2>
+            <p style={{ color: "var(--text2)" }}>{statusText || LOADING_STEPS[progressIndex]}</p>
+          </div>
+
           <div
             style={{
               width: 140,
               height: 140,
-              margin: "0 auto 48px",
+              margin: "0 auto 40px",
               position: "relative",
               display: "flex",
               alignItems: "center",
@@ -213,61 +230,36 @@ export function ScanPage({ setPage, setReport }) {
           </div>
           <style dangerouslySetInnerHTML={{ __html: "@keyframes spin { 100% { transform: rotate(360deg); } }" }} />
 
-          <div style={{ fontFamily: "var(--font-head)", fontSize: 20, fontWeight: 600, marginBottom: 6 }}>
-            Scanning {form.business_name || "your business"}...
-          </div>
-          {statusText && <div style={{ color: "var(--text3)", marginBottom: 28, fontSize: 14 }}>{statusText}</div>}
-          <div style={{ marginTop: 40, textAlign: "left" }}>
-            {agentStates.map((agent, index) => (
-              <Motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 16,
-                  padding: "12px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.05)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 13,
-                }}
-                key={agent.name}
-              >
-                <span
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    background:
-                      agent.status === "done" ? "var(--teal)" : agent.status === "active" ? "var(--accent)" : "var(--text3)",
-                    boxShadow:
-                      agent.status !== "pending" ? `0 0 10px ${agent.status === "done" ? "var(--teal)" : "var(--accent)"}` : "none",
-                    animation: agent.status === "active" ? "pulse 1s infinite" : "none",
-                  }}
-                />
-                <span style={{ flex: 1, color: agent.status === "done" ? "var(--text)" : "var(--text2)" }}>{agent.name}</span>
-                <span
-                  style={{
-                    fontSize: 11,
-                    letterSpacing: "0.05em",
-                    padding: "4px 10px",
-                    borderRadius: 4,
-                    fontWeight: 500,
-                    background:
-                      agent.status === "done"
-                        ? "rgba(192,167,255,0.1)"
-                        : agent.status === "active"
-                          ? "rgba(208,188,255,0.15)"
-                          : "rgba(255,255,255,0.03)",
-                    color:
-                      agent.status === "done" ? "var(--teal)" : agent.status === "active" ? "var(--accent)" : "var(--text3)",
-                  }}
-                >
-                  {agent.status === "done" ? "DONE" : agent.status === "active" ? "RUNNING" : "WAITING"}
-                </span>
-              </Motion.div>
-            ))}
+          <div
+            style={{
+              marginTop: 28,
+              padding: "20px 24px",
+              borderRadius: 12,
+              border: "1px solid var(--border2)",
+              background: "var(--surface2)",
+              textAlign: "left",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+                color: "var(--text3)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                marginBottom: 12,
+              }}
+            >
+              Progress
+            </div>
+            <div style={{ color: "var(--text)", lineHeight: 1.7, fontSize: 15 }}>
+              {LOADING_STEPS.map((item, index) => (
+                <div key={item} style={{ opacity: index <= progressIndex ? 1 : 0.35 }}>
+                  {index <= progressIndex ? "Running: " : "Waiting: "}
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
         </GlowCard>
       )}

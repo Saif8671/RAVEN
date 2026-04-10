@@ -1,8 +1,8 @@
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
 
-export function IncidentPage({ setPage }) {
-  const playbookSteps = [];
+export function IncidentPage({ setPage, report }) {
+  const playbookSteps = report?.aiGuide?.incidentPlaybook || [];
 
   return (
     <Motion.div
@@ -36,18 +36,17 @@ export function IncidentPage({ setPage }) {
       </div>
 
       <p style={{ fontSize: 18, color: "var(--text2)", marginBottom: 48, lineHeight: 1.6 }}>
-        If you suspect a breach, time is your most important asset. This screen no longer ships with a built-in playbook.
-        Ask the backend to provide the response steps for the current incident.
+        If you suspect a breach, time is your most important asset. This playbook is generated from the latest scan and focuses on the fastest containment steps.
       </p>
 
       <div style={{ position: "relative", paddingLeft: 40, borderLeft: "2px solid var(--border2)" }}>
         {playbookSteps.length > 0 ? (
-          playbookSteps.map((step, i) => (
+          playbookSteps.map((step, index) => (
             <Motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.15 }}
-              key={i}
+              transition={{ delay: index * 0.15 }}
+              key={step}
               style={{ position: "relative", marginBottom: 48 }}
             >
               <div
@@ -69,24 +68,7 @@ export function IncidentPage({ setPage }) {
               </div>
 
               <GlowCard style={{ padding: 32 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 16 }}>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "var(--accent)",
-                      letterSpacing: "0.05em",
-                      padding: "6px 12px",
-                      background: "rgba(208, 188, 255, 0.1)",
-                      borderRadius: 4,
-                    }}
-                  >
-                    {step.time}
-                  </div>
-                  <h3 style={{ fontFamily: "var(--font-head)", fontSize: 20, fontWeight: 600, margin: 0 }}>{step.title}</h3>
-                </div>
-                <p style={{ color: "var(--text2)", lineHeight: 1.6, margin: 0, fontSize: 15 }}>{step.desc}</p>
+                <p style={{ color: "var(--text2)", lineHeight: 1.6, margin: 0, fontSize: 15 }}>{step}</p>
               </GlowCard>
             </Motion.div>
           ))
@@ -100,7 +82,7 @@ export function IncidentPage({ setPage }) {
               color: "var(--text2)",
             }}
           >
-            No incident playbook has been loaded yet.
+            No incident playbook has been loaded yet. Run a scan first.
           </div>
         )}
       </div>
@@ -109,7 +91,9 @@ export function IncidentPage({ setPage }) {
         <button className="btn-primary" onClick={() => setPage("scan")}>
           Run Compromise Scan
         </button>
-        <button className="btn-ghost" onClick={() => setPage("home")}>Cancel</button>
+        <button className="btn-ghost" onClick={() => setPage("home")}>
+          Cancel
+        </button>
       </div>
     </Motion.div>
   );

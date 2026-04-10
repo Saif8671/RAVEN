@@ -23,7 +23,7 @@ export default function App() {
         {page === "home" && <HomePage key="home" setPage={setPage} />}
         {page === "scan" && <ScanPage key="scan" setPage={setPage} setReport={setReport} />}
         {page === "results" && <ResultsPage key="results" setPage={setPage} report={report} />}
-        {page === "incident" && <IncidentPage key="incident" setPage={setPage} />}
+        {page === "incident" && <IncidentPage key="incident" setPage={setPage} report={report} />}
       </AnimatePresence>
     </>
   );

@@ -1,20 +1,23 @@
 import { useState } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
+const severityColorMap = {
+  CRITICAL: "var(--threat)",
+  HIGH: "#ffcc99",
+  MEDIUM: "#fce8b2",
+  LOW: "var(--teal)",
+};
+
+const severityBgMap = {
+  CRITICAL: "rgba(255, 180, 171, 0.15)",
+  HIGH: "rgba(255, 204, 153, 0.1)",
+  MEDIUM: "rgba(252, 232, 178, 0.1)",
+  LOW: "rgba(168, 240, 221, 0.1)",
+};
+
 export function FindingCard({ f, idx }) {
   const [expanded, setExpanded] = useState(false);
-
-  const getSevColor = (severity) =>
-    severity === "Critical" ? "var(--threat)" : severity === "High" ? "#ffcc99" : severity === "Medium" ? "#fce8b2" : "var(--teal)";
-
-  const getSevBg = (severity) =>
-    severity === "Critical"
-      ? "rgba(255, 180, 171, 0.15)"
-      : severity === "High"
-        ? "rgba(255, 204, 153, 0.1)"
-        : severity === "Medium"
-          ? "rgba(252, 232, 178, 0.1)"
-          : "rgba(168, 240, 221, 0.1)";
+  const severity = f.severity || "MEDIUM";
 
   return (
     <Motion.div
@@ -43,22 +46,22 @@ export function FindingCard({ f, idx }) {
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: "0.05em",
-            color: getSevColor(f.severity),
-            background: getSevBg(f.severity),
+            color: severityColorMap[severity] || "var(--text2)",
+            background: severityBgMap[severity] || "rgba(255,255,255,0.05)",
             minWidth: 80,
             textAlign: "center",
             textTransform: "uppercase",
           }}
         >
-          {f.severity}
+          {severity}
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: "var(--font-head)", fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
-            {f.plain_english}
+            {f.plainEnglish || f.message || f.id}
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text3)", display: "flex", gap: 16 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text3)", display: "flex", gap: 16, flexWrap: "wrap" }}>
             <span>ID: {f.id}</span>
-            <span>Est. time: {f.time_estimate}</span>
+            <span>Est. time: {f.estimatedTime || "5 minutes"}</span>
           </div>
         </div>
         <div style={{ color: "var(--text3)", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
@@ -87,17 +90,22 @@ export function FindingCard({ f, idx }) {
               >
                 How to fix it:
               </div>
-              <ul style={{ paddingLeft: 0, listStyle: "none" }}>
-                {f.fix_steps.map((step, i) => (
-                  <li key={i} style={{ position: "relative", paddingLeft: 24, marginBottom: 12, color: "var(--text2)", fontSize: 15, lineHeight: 1.6 }}>
-                    <span style={{ position: "absolute", left: 0, top: 8, width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />
-                    {step}
-                  </li>
-                ))}
-              </ul>
-              <button className="btn-ghost" style={{ marginTop: 24, padding: "12px 24px" }}>
-                Mark as Fixed
-              </button>
+              {Array.isArray(f.steps) && f.steps.length ? (
+                <ol style={{ paddingLeft: 20, color: "var(--text2)" }}>
+                  {f.steps.map((step) => (
+                    <li key={step} style={{ marginBottom: 12, lineHeight: 1.6 }}>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div style={{ color: "var(--text2)" }}>No fix steps were returned.</div>
+              )}
+              {f.codeSnippet ? (
+                <pre style={{ marginTop: 16, padding: 14, borderRadius: 8, background: "var(--bg2)", overflowX: "auto", color: "var(--text3)" }}>
+                  <code>{f.codeSnippet}</code>
+                </pre>
+              ) : null}
             </div>
           </Motion.div>
         )}

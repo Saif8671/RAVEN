@@ -86,3 +86,23 @@ add ai chat bot that help you resolve your problem
 add shedulel scanning  to your website s 
 look for breaches 
 add a educational conetsnt section for providing a knowledge 
+
+
+
+workflow:
+
+[Frontend Form]
+      ↓
+[/api/scan/full]
+      ↓
+[vulnScan + emailScan + breachScan] ← parallel
+      ↓
+[scorer → risk score 0-100]
+      ↓
+[grock → fix guide] chat based 
+      ↓
+[Supervity → 5 agents → full report] supervity workflow1
+      ↓
+[Report saved + returned to frontend]
+      ↓
+[User clicks Email] → [Supervity email workflow] → [Inbox] supoervity workflow2
