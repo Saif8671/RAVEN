@@ -22,8 +22,6 @@ export function Nav({ page, setPage }) {
             {l.label}
           </button>
         ))}
-        <button className="btn-ghost" style={{ padding: "10px 24px" }} onClick={() => setPage(PAGES.SCAN)}>
-        </button>
       </div>
     </Motion.nav>
   );

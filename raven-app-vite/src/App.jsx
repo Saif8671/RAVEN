@@ -11,6 +11,8 @@ import { ScanPage } from "./pages/ScanPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { IncidentPage } from "./pages/IncidentPage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { PasswordPage } from "./pages/PasswordPage";
+import { PhishingPage } from "./pages/PhishingPage";
 
 import "./styles/global.css";
 
@@ -36,6 +38,8 @@ export default function App() {
     [PAGES.RESULTS]: <ResultsPage key={PAGES.RESULTS} setPage={setPage} report={report} />,
     [PAGES.INCIDENT]: <IncidentPage key={PAGES.INCIDENT} setPage={setPage} report={report} />,
     [PAGES.HISTORY]: <HistoryPage key={PAGES.HISTORY} setPage={setPage} setReport={handleSetReport} reports={history} />,
+    [PAGES.PASSWORD]: <PasswordPage key={PAGES.PASSWORD} />,
+    [PAGES.PHISHING]: <PhishingPage key={PAGES.PHISHING} />,
   };
 
   return (

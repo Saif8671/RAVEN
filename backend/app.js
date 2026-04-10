@@ -33,6 +33,22 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/phishing', phishingRoutes);
 
+// Legacy Aliases
+app.post('/api/scan/full', (req, res, next) => {
+  req.url = '/'; // Redirect to scanRouter base
+  scanRoutes(req, res, next);
+});
+
+app.get('/api/reports', (req, res, next) => {
+  req.url = '/history';
+  scanRoutes(req, res, next);
+});
+
+app.get('/api/report/:id', (req, res, next) => {
+  req.url = `/${req.params.id}`;
+  scanRoutes(req, res, next);
+});
+
 // Error Handling
 app.use((err, req, res, next) => {
   console.error(err.stack);

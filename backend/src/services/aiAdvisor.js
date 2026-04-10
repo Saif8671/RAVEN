@@ -4,33 +4,38 @@ dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export const getAIAdvice = async (scanData, businessProfile) => {
+export const getAIAdvice = async (scanData, businessProfile = {}) => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
     You are an expert Cybersecurity Consultant for Small Businesses.
-    Business: ${businessProfile.name}
-    Industry: ${businessProfile.industry}
+    Business: ${businessProfile.name || 'Small Business'}
     Security Scan Results for ${scanData.domain}:
     Score: ${scanData.score}/100
     Findings: ${JSON.stringify(scanData.findings)}
 
-    Based on this, generate a professional but accessible security report.
-    Provide:
-    1. A "Bottom Line" summary (2 sentences, no jargon).
-    2. A "Threat Scenario": How a hacker might target a business like this using these vulnerabilities.
-    3. "Top 3 Action Items": Precise, numbered, and prioritized.
-    4. A "30-Day Roadmap": Simple steps to improve.
+    Generate a structured JSON response (no markdown blocks around it) with the following keys:
+    1. "summary_message": A "Bottom Line" summary (2 sentences, no jargon).
+    2. "attackStory": A narrative of how a hacker might target this specific business using these vulnerabilities.
+    3. "quickWins": Array of 3 precise, high-impact action items.
+    4. "fixes": Array of objects { "issue": "Name", "plainEnglish": "What it is", "steps": ["Step 1", "Step 2"] }.
+    5. "incidentPlaybook": Array of 4 steps to take if breached.
 
-    Use Markdown formatting.
+    JSON ONLY.
   `;
 
   try {
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const text = result.response.text().replace(/```json|```/g, "").trim();
+    return JSON.parse(text);
   } catch (error) {
     console.error('Gemini AI Error:', error);
-    return "AI Advisor is temporarily offline. Please follow the standard security recommendations below.";
+    return {
+      summary_message: "AI Advisor is temporarily offline. Focus on fixing the SSL and Header findings.",
+      attackStory: "Scan results indicate technical vulnerabilities that could be exploited by automated scripts.",
+      quickWins: ["Enable HSTS", "Add CSP Headers", "Verify SSL Certificate"],
+      fixes: [],
+      incidentPlaybook: ["Disconnect affected systems", "Reset admin passwords", "Notify IT support"]
+    };
   }
 };
