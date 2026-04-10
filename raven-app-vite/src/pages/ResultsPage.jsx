@@ -4,12 +4,6 @@ import { FindingCard } from "../components/FindingCard";
 import { sendReportEmail } from "../lib/api";
 import { PAGES } from "../lib/pages";
 
-function severityLabel(score) {
-  if (score >= 80) return "GOOD";
-  if (score >= 60) return "FAIR";
-  if (score >= 40) return "POOR";
-  return "CRITICAL";
-}
 
 export function ResultsPage({ setPage, report }) {
   const [emailRecipient, setEmailRecipient] = useState(report?.email || "");
@@ -17,10 +11,17 @@ export function ResultsPage({ setPage, report }) {
   const [emailError, setEmailError] = useState("");
 
   const activeReport = report;
+  const activeBand = activeReport?.band || "UNKNOWN";
 
   const sendEmail = async () => {
     if (!activeReport?.id) {
       setEmailError("No report is available to send.");
+      return;
+    }
+
+    if (!String(emailRecipient || "").trim()) {
+      setEmailStatus("");
+      setEmailError("Enter an email address before sending the report.");
       return;
     }
 
@@ -29,7 +30,7 @@ export function ResultsPage({ setPage, report }) {
       setEmailStatus("Sending report...");
       const response = await sendReportEmail({
         reportId: activeReport.id,
-        recipientEmail: emailRecipient,
+        recipientEmail: String(emailRecipient).trim(),
       });
       setEmailStatus(response.message || `Report sent to ${emailRecipient}.`);
     } catch (error) {
@@ -133,7 +134,7 @@ export function ResultsPage({ setPage, report }) {
             {activeReport.score ?? "N/A"}
             <span style={{ fontSize: 24, color: "var(--text3)", textShadow: "none" }}>/100</span>
           </div>
-          <div style={{ color: "var(--text2)", marginTop: 8 }}>{severityLabel(activeReport.score)} band</div>
+          <div style={{ color: "var(--text2)", marginTop: 8 }}>{activeBand} band</div>
         </div>
       </div>
 
