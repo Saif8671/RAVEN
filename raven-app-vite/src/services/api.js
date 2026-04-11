@@ -37,6 +37,18 @@ export async function scanVulnerability(domain) {
   return request('/vulnerability/scan', { domain });
 }
 
+export async function getScheduledScans() {
+  return request('/vulnerability/schedules', null, 'GET');
+}
+
+export async function scheduleScan(domain, frequency, notifyEmail) {
+  return request('/vulnerability/schedule', { domain, frequency, notifyEmail });
+}
+
+export async function deleteScheduledScan(domain) {
+  return request(`/vulnerability/schedule/${domain}`, null, 'DELETE');
+}
+
 // ── Email Security ────────────────────────────────────────────
 export async function checkEmailSecurity(domain) {
   return request('/email-security/check', { domain });
