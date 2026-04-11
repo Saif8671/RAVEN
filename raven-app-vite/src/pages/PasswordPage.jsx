@@ -37,31 +37,32 @@ export function PasswordPage() {
   const theme = STATUS_THEMES[status] || STATUS_THEMES.INERT;
 
   return (
-    <Motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <Motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       className="elite-page"
     >
       <div className="elite-container">
         <header className="elite-header">
           <div className="elite-subtitle">Secure Encryption Interface</div>
-          <h1 className="elite-title">Security Scanner Elite</h1>
+          <h1 className="elite-title">Security Scanner </h1>
+          <h1 className="elite-title">Security Scanner </h1>
         </header>
 
         <main className="elite-glass-card">
           <div className="elite-input-section">
             <div className="elite-input-wrapper">
-              <input 
-                type={visible ? "text" : "password"} 
-                className="elite-input" 
-                placeholder="Initialize security sequence..." 
+              <input
+                type={visible ? "text" : "password"}
+                className="elite-input"
+                placeholder="Initialize security sequence..."
                 spellCheck="false"
                 value={password}
                 onChange={(e) => handleCheck(e.target.value)}
               />
               <div className="elite-input-line"></div>
-              <button 
-                className="elite-toggle-btn" 
+              <button
+                className="elite-toggle-btn"
                 onClick={() => setVisible(!visible)}
                 type="button"
               >
@@ -75,7 +76,7 @@ export function PasswordPage() {
 
             <AnimatePresence>
               {result?.isBreached && (
-                <Motion.div 
+                <Motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -93,9 +94,9 @@ export function PasswordPage() {
               <div className="elite-label-header">Current Strength</div>
               <div className="elite-strength-label" style={{ color: theme.color }}>{status}</div>
               <div className="elite-liquid-meter">
-                <div 
-                  className="elite-liquid-fill" 
-                  style={{ 
+                <div
+                  className="elite-liquid-fill"
+                  style={{
                     width: result ? `${result.advanced.percent}%` : '0%',
                     background: theme.color,
                     boxShadow: `0 0 15px ${theme.color}66`
