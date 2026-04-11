@@ -1,4 +1,4 @@
-function calculateRiskScore(findings) {
+export function calculateRiskScore(findings) {
   let deductions = 0;
 
   // SSL (max 30 points)
@@ -49,5 +49,3 @@ function calculateRiskScore(findings) {
         : "#ef4444",
   };
 }
-
-module.exports = { calculateRiskScore };

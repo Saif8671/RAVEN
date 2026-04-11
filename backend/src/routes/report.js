@@ -1,8 +1,7 @@
-const express = require("express");
-const router = express.Router();
-// Email utility logic removed in favor of utils/mailer.js
+import express from 'express';
+import * as mailer from '../utils/mailer.js';
 
-const mailer = require("../utils/mailer");
+const router = express.Router();
 
 // POST /api/report/email
 router.post("/email", async (req, res) => {
@@ -33,9 +32,9 @@ router.post("/generate", (req, res) => {
   if (!reportData) return res.status(400).json({ error: "reportData required" });
 
   res.json({
-    html: buildReportHTML(reportData),
+    html: mailer.buildReportHTML(reportData),
     generatedAt: new Date().toISOString(),
   });
 });
 
-module.exports = router;
+export default router;

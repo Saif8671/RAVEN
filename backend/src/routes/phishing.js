@@ -1,7 +1,8 @@
-const express = require("express");
+import express from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
+
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
-const nodemailer = require("nodemailer");
 
 // In-memory store for demo (use DB in production)
 const campaigns = new Map();
@@ -65,6 +66,25 @@ const PHISHING_TEMPLATES = [
   },
 ];
 
+function generateAwarenessReport(openRate, clickRate) {
+  if (clickRate > 30) {
+    return {
+      risk: "High",
+      message: "Over 30% of employees clicked the phishing link. Immediate security awareness training is recommended.",
+    };
+  } else if (clickRate > 15) {
+    return {
+      risk: "Medium",
+      message: "Some employees clicked the phishing link. Schedule a training session and reinforce email safety policies.",
+    };
+  } else {
+    return {
+      risk: "Low",
+      message: "Most employees resisted the phishing attempt. Keep up the awareness training!",
+    };
+  }
+}
+
 // GET /api/phishing/templates
 router.get("/templates", (req, res) => {
   res.json(PHISHING_TEMPLATES.map(({ id, name, difficulty, category }) => ({
@@ -108,8 +128,6 @@ router.post("/campaign", async (req, res) => {
 
   campaigns.set(campaignId, campaign);
 
-  // In production: actually send emails via nodemailer
-  // For demo, we simulate sending
   res.json({
     campaignId,
     message: `Phishing simulation campaign created for ${targetEmails.length} target(s)`,
@@ -123,7 +141,6 @@ router.get("/campaign/:id", (req, res) => {
   const campaign = campaigns.get(req.params.id);
   if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
-  // Simulate some results for demo
   const openRate = Math.floor(Math.random() * 40) + 20;
   const clickRate = Math.floor(Math.random() * 30) + 5;
 
@@ -155,23 +172,4 @@ router.get("/track/:campaignId", (req, res) => {
   res.redirect("/phishing-awareness");
 });
 
-function generateAwarenessReport(openRate, clickRate) {
-  if (clickRate > 30) {
-    return {
-      risk: "High",
-      message: "Over 30% of employees clicked the phishing link. Immediate security awareness training is recommended.",
-    };
-  } else if (clickRate > 15) {
-    return {
-      risk: "Medium",
-      message: "Some employees clicked the phishing link. Schedule a training session and reinforce email safety policies.",
-    };
-  } else {
-    return {
-      risk: "Low",
-      message: "Most employees resisted the phishing attempt. Keep up the awareness training!",
-    };
-  }
-}
-
-module.exports = router;
+export default router;

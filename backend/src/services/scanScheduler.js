@@ -1,15 +1,20 @@
-const cron = require("node-cron");
-const fs = require("fs");
-const path = require("path");
-const vulnerabilityService = require("./vulnerabilityService");
-const mailer = require("../utils/mailer");
+import cron from 'node-cron';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import * as vulnerabilityService from './vulnerabilityService.js';
+import * as mailer from '../utils/mailer.js';
 
-const DB_PATH = path.join(__dirname, "../data/schedules.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Data directory is at backend/data/
+const DB_PATH = path.resolve(__dirname, "../../data/schedules.json");
 
 // In-memory scan registry synced with file
 let scheduledScans = [];
 
-function loadSchedules() {
+export function loadSchedules() {
   try {
     if (fs.existsSync(DB_PATH)) {
       const data = fs.readFileSync(DB_PATH, "utf8");
@@ -24,8 +29,12 @@ function loadSchedules() {
   }
 }
 
-function saveSchedules() {
+export function saveSchedules() {
   try {
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     fs.writeFileSync(DB_PATH, JSON.stringify(scheduledScans, null, 2));
   } catch (err) {
     console.error("[Scheduler] Failed to save schedules:", err.message);
@@ -51,7 +60,7 @@ async function runScheduledScans(frequency) {
   }
 }
 
-function init() {
+export function init() {
   loadSchedules();
 
   // Daily at midnight
@@ -66,8 +75,8 @@ function init() {
   console.log("[Scheduler] Multi-frequency scan scheduler initialized (Daily, Weekly, Monthly)");
 }
 
-function register(domain, frequency, notifyEmail) {
-  // Remove existing if any for the same domain (ensure unique per domain)
+export function register(domain, frequency, notifyEmail) {
+  // Remove existing if any for the same domain
   scheduledScans = scheduledScans.filter((s) => s.domain !== domain);
 
   const newConfig = {
@@ -83,7 +92,7 @@ function register(domain, frequency, notifyEmail) {
   return { ...newConfig, message: `${frequency} scan registered` };
 }
 
-function unregister(domain) {
+export function unregister(domain) {
   const initialLength = scheduledScans.length;
   scheduledScans = scheduledScans.filter((s) => s.domain !== domain);
   saveSchedules();
@@ -94,8 +103,6 @@ function unregister(domain) {
   return { domain, message: "No scheduled scan found for this domain" };
 }
 
-function listScans() {
+export function listScans() {
   return scheduledScans;
 }
-
-module.exports = { init, register, unregister, listScans };

@@ -1,40 +1,12 @@
-const express = require("express");
+import express from 'express';
+import axios from 'axios';
+
 const router = express.Router();
-const axios = require("axios");
-
-// POST /api/breach/check
-router.post("/check", async (req, res) => {
-  const { email, domain } = req.body;
-  if (!email && !domain) return res.status(400).json({ error: "Email or domain required" });
-
-  try {
-    const results = [];
-
-    if (email) {
-      const breaches = await checkEmailBreaches(email);
-      results.push({ type: "email", target: email, ...breaches });
-    }
-
-    if (domain) {
-      const domainBreaches = await checkDomainBreaches(domain);
-      results.push({ type: "domain", target: domain, ...domainBreaches });
-    }
-
-    res.json({
-      checkedAt: new Date().toISOString(),
-      results,
-      summary: generateBreachSummary(results),
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 async function checkEmailBreaches(email) {
   const apiKey = process.env.HIBP_API_KEY;
 
   if (!apiKey) {
-    // Mock data for demo/hackathon without API key
     return {
       breached: false,
       breachCount: 0,
@@ -111,4 +83,32 @@ function generateBreachSummary(results) {
   return `Found ${totalBreaches} breach(es). Change your passwords immediately and enable two-factor authentication on all accounts.`;
 }
 
-module.exports = router;
+// POST /api/breach/check
+router.post("/check", async (req, res) => {
+  const { email, domain } = req.body;
+  if (!email && !domain) return res.status(400).json({ error: "Email or domain required" });
+
+  try {
+    const results = [];
+
+    if (email) {
+      const breaches = await checkEmailBreaches(email);
+      results.push({ type: "email", target: email, ...breaches });
+    }
+
+    if (domain) {
+      const domainBreaches = await checkDomainBreaches(domain);
+      results.push({ type: "domain", target: domain, ...domainBreaches });
+    }
+
+    res.json({
+      checkedAt: new Date().toISOString(),
+      results,
+      summary: generateBreachSummary(results),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+export default router;

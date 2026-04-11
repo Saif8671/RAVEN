@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from 'nodemailer';
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -12,7 +12,7 @@ function createTransporter() {
   });
 }
 
-function buildReportHTML(reportData) {
+export function buildReportHTML(reportData) {
   const { domain, score, findings, plainEnglishSummary, fixGuide } = reportData;
   const scoreColor = score?.color || "#eab308";
 
@@ -52,7 +52,7 @@ function buildReportHTML(reportData) {
   `;
 }
 
-async function sendReportEmail(to, reportData) {
+export async function sendReportEmail(to, reportData) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log("[Mailer] Email not configured. Skipping email send.");
     return { success: false, reason: "No credentials" };
@@ -72,5 +72,3 @@ async function sendReportEmail(to, reportData) {
     return { success: false, error: err.message };
   }
 }
-
-module.exports = { sendReportEmail };

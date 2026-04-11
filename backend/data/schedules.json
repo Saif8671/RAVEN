@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "domain": "https://ai-halucination-verifiyer.vercel.app/",
+    "frequency": "weekly",
+    "notifyEmail": "saifurrahman8671@gmail.com",
+    "registeredAt": "2026-04-11T19:35:34.637Z"
+  }
+]

@@ -1,4 +1,5 @@
-const express = require("express");
+import express from 'express';
+
 const router = express.Router();
 
 const INCIDENT_TYPES = {
@@ -197,4 +198,4 @@ router.post("/diagnose", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

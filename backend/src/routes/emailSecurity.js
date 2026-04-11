@@ -1,42 +1,7 @@
-const express = require("express");
+import express from 'express';
+import { promises as dns } from 'dns';
+
 const router = express.Router();
-const dns = require("dns").promises;
-
-// POST /api/email-security/check
-router.post("/check", async (req, res) => {
-  const { domain } = req.body;
-  if (!domain) return res.status(400).json({ error: "Domain is required" });
-
-  try {
-    const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-
-    const [spf, dmarc, dkim] = await Promise.all([
-      checkSPF(cleanDomain),
-      checkDMARC(cleanDomain),
-      checkDKIM(cleanDomain),
-    ]);
-
-    const issues = [];
-    if (!spf.found) issues.push("No SPF record — attackers can send emails pretending to be from your domain.");
-    if (!dmarc.found) issues.push("No DMARC record — you have no policy for handling spoofed emails.");
-    if (!dkim.found) issues.push("DKIM not detected — emails from your domain may not be verified.");
-
-    res.json({
-      domain: cleanDomain,
-      spf,
-      dkim,
-      dmarc,
-      issues,
-      plainEnglish:
-        issues.length === 0
-          ? "Your email security is properly configured. Attackers cannot easily spoof your domain."
-          : `Your email is not fully protected: ${issues.join(" ")}`,
-      fixSteps: generateEmailFixSteps(spf, dkim, dmarc),
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 async function checkSPF(domain) {
   try {
@@ -99,4 +64,40 @@ function generateEmailFixSteps(spf, dkim, dmarc) {
   return steps;
 }
 
-module.exports = router;
+// POST /api/email-security/check
+router.post("/check", async (req, res) => {
+  const { domain } = req.body;
+  if (!domain) return res.status(400).json({ error: "Domain is required" });
+
+  try {
+    const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+
+    const [spf, dmarc, dkim] = await Promise.all([
+      checkSPF(cleanDomain),
+      checkDMARC(cleanDomain),
+      checkDKIM(cleanDomain),
+    ]);
+
+    const issues = [];
+    if (!spf.found) issues.push("No SPF record — attackers can send emails pretending to be from your domain.");
+    if (!dmarc.found) issues.push("No DMARC record — you have no policy for handling spoofed emails.");
+    if (!dkim.found) issues.push("DKIM not detected — emails from your domain may not be verified.");
+
+    res.json({
+      domain: cleanDomain,
+      spf,
+      dkim,
+      dmarc,
+      issues,
+      plainEnglish:
+        issues.length === 0
+          ? "Your email security is properly configured. Attackers cannot easily spoof your domain."
+          : `Your email is not fully protected: ${issues.join(" ")}`,
+      fixSteps: generateEmailFixSteps(spf, dkim, dmarc),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+export default router;
