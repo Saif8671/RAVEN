@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
+import { checkPassword } from "../services/api";
 
 export function PasswordPage() {
   const [password, setPassword] = useState("");
@@ -12,13 +13,7 @@ export function PasswordPage() {
     if (!password) return;
     setLoading(true);
     try {
-      // Mapping to the new endpoint
-      const response = await fetch("http://localhost:5000/api/password/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password })
-      });
-      const data = await response.json();
+      const data = await checkPassword({ password });
       setResult(data);
     } catch (err) {
       console.error(err);

@@ -1,5 +1,5 @@
 import { motion as Motion } from "framer-motion";
-import { NAV_LINKS, PAGES } from "../lib/pages";
+import { NAV_LINKS, PAGES } from "../constants/navigation";
 
 export function Nav({ page, setPage }) {
   return (

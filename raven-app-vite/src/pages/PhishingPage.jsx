@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
+import { fetchPhishingQuiz } from "../services/api";
 
 export function PhishingPage() {
   const [quiz, setQuiz] = useState([]);
@@ -14,12 +15,7 @@ export function PhishingPage() {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/phishing/quiz", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ industry: "General Business" })
-        });
-        const data = await response.json();
+        const data = await fetchPhishingQuiz({ industry: "General Business" });
         setQuiz(data);
       } catch (err) {
         console.error(err);

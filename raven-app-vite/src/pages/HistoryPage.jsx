@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
-import { fetchReport, fetchReports } from "../lib/api";
-import { PAGES } from "../lib/pages";
+import { fetchReport, fetchReports } from "../services/api";
+import { PAGES } from "../constants/navigation";
 
 const bandColor = {
   GOOD: "var(--teal)",

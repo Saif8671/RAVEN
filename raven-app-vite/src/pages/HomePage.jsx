@@ -1,7 +1,7 @@
 import { motion as Motion } from "framer-motion";
 import { Ticker } from "../components/Ticker";
 import { GlowCard } from "../components/GlowCard";
-import { PAGES } from "../lib/pages";
+import { PAGES } from "../constants/navigation";
 
 export function HomePage({ setPage }) {
   const crisisStats = [

@@ -1,6 +1,6 @@
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
-import { PAGES } from "../lib/pages";
+import { PAGES } from "../constants/navigation";
 
 export function IncidentPage({ setPage, report }) {
   const playbookSteps = report?.aiGuide?.incidentPlaybook || [];

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { FindingCard } from "../components/FindingCard";
-import { sendReportEmail } from "../lib/api";
-import { PAGES } from "../lib/pages";
+import { sendReportEmail } from "../services/api";
+import { PAGES } from "../constants/navigation";
 
 
 export function ResultsPage({ setPage, report }) {

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
-import { runFullScan } from "../lib/api";
-import { PAGES } from "../lib/pages";
-import { isValidDomain, isValidEmail, normalizeInput } from "../lib/validation";
+import { runFullScan } from "../services/api";
+import { PAGES } from "../constants/navigation";
+import { isValidDomain, isValidEmail, normalizeInput } from "../utils/validation";
 
 const LOADING_STEPS = [
   "Checking SSL...",

@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { Nav } from "./components/Nav";
 
 // Pages
-import { PAGES } from "./lib/pages";
+import { PAGES } from "./constants/navigation";
 import { HomePage } from "./pages/HomePage";
 import { ScanPage } from "./pages/ScanPage";
 import { ResultsPage } from "./pages/ResultsPage";
