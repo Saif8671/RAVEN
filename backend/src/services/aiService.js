@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq = null;
 
 const SYSTEM_PROMPT = `You are RAVEN AI, a Senior Lead Cybersecurity Incident Responder. 
 Your role is to assist users during active cyber incidents, providing clear, actionable, and rapid advice. 
@@ -16,6 +16,10 @@ export async function chatWithGroq(message, history = []) {
   try {
     if (!process.env.GROQ_API_KEY) {
       throw new Error("GROQ_API_KEY is not configured on the server.");
+    }
+
+    if (!groq) {
+      groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     }
 
     const messages = [
