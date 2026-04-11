@@ -1,6 +1,7 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import nodemailer from 'nodemailer';
+import * as mailer from '../utils/mailer.js';
+import { getPhishingHTML } from '../utils/phishingTemplates.js';
 
 const router = express.Router();
 
@@ -103,36 +104,49 @@ router.post("/campaign", async (req, res) => {
   if (!template) return res.status(404).json({ error: "Template not found" });
 
   const campaignId = uuidv4();
+  const cName = companyName || "Your Company";
+  
+  const results = targetEmails.map((email) => ({
+    email,
+    trackingId: uuidv4(),
+    opened: false,
+    clicked: false,
+    reported: false,
+  }));
+
   const campaign = {
     id: campaignId,
     templateId,
     template,
-    companyName: companyName || "Your Company",
+    companyName: cName,
     targetEmails,
     sentAt: new Date().toISOString(),
-    status: "sent",
-    stats: {
-      sent: targetEmails.length,
-      opened: 0,
-      clicked: 0,
-      reported: 0,
-    },
-    results: targetEmails.map((email) => ({
-      email,
-      trackingId: uuidv4(),
-      opened: false,
-      clicked: false,
-      reported: false,
-    })),
+    status: "sending",
+    results,
   };
 
   campaigns.set(campaignId, campaign);
 
+  // Send emails in background
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+  
+  (async () => {
+    let sentCount = 0;
+    for (const recipient of results) {
+      const trackingUrl = `${backendUrl}/api/phishing/track/${campaignId}?tid=${recipient.trackingId}&type=click`;
+      const html = getPhishingHTML(templateId, trackingUrl, cName);
+      
+      const res = await mailer.sendPhishingEmail(recipient.email, template.subject, html);
+      if (res.success) sentCount++;
+    }
+    campaign.status = "sent";
+    console.log(`[Phishing] Campaign ${campaignId} finished sending. ${sentCount}/${targetEmails.length} delivered.`);
+  })();
+
   res.json({
     campaignId,
-    message: `Phishing simulation campaign created for ${targetEmails.length} target(s)`,
+    message: `Phishing simulation campaign started for ${targetEmails.length} target(s)`,
     template: template.name,
-    trackingUrl: `${process.env.BACKEND_URL || "http://localhost:5000"}/api/phishing/track/${campaignId}`,
   });
 });
 
@@ -141,16 +155,21 @@ router.get("/campaign/:id", (req, res) => {
   const campaign = campaigns.get(req.params.id);
   if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
-  const openRate = Math.floor(Math.random() * 40) + 20;
-  const clickRate = Math.floor(Math.random() * 30) + 5;
+  const total = campaign.targetEmails.length;
+  const opened = campaign.results.filter(r => r.opened).length;
+  const clicked = campaign.results.filter(r => r.clicked).length;
+  const reported = campaign.results.filter(r => r.reported).length;
+
+  const openRate = total > 0 ? Math.floor((opened / total) * 100) : 0;
+  const clickRate = total > 0 ? Math.floor((clicked / total) * 100) : 0;
 
   res.json({
     ...campaign,
     stats: {
-      sent: campaign.stats.sent,
-      opened: Math.floor((campaign.stats.sent * openRate) / 100),
-      clicked: Math.floor((campaign.stats.sent * clickRate) / 100),
-      reported: Math.floor(campaign.stats.sent * 0.1),
+      sent: total,
+      opened,
+      clicked,
+      reported,
       openRate: `${openRate}%`,
       clickRate: `${clickRate}%`,
     },
@@ -158,18 +177,26 @@ router.get("/campaign/:id", (req, res) => {
   });
 });
 
-// GET /api/phishing/track/:campaignId (simulates tracking pixel / link click)
+// GET /api/phishing/track/:campaignId
 router.get("/track/:campaignId", (req, res) => {
   const { type, tid } = req.query;
   const campaign = campaigns.get(req.params.campaignId);
+  
   if (campaign) {
-    const result = campaign.results.find((r) => r.trackingId === tid);
-    if (result) {
-      if (type === "open") result.opened = true;
-      if (type === "click") result.clicked = true;
+    const recipient = campaign.results.find((r) => r.trackingId === tid);
+    if (recipient) {
+      if (type === "click") {
+        recipient.clicked = true;
+        recipient.opened = true; // Clicking implies opening
+      } else if (type === "open") {
+        recipient.opened = true;
+      }
     }
   }
-  res.redirect("/phishing-awareness");
+
+  // Redirect to frontend awareness page
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  res.redirect(`${frontendUrl}/phishing-awareness`);
 });
 
 export default router;

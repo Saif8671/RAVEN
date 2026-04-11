@@ -72,3 +72,24 @@ export async function sendReportEmail(to, reportData) {
     return { success: false, error: err.message };
   }
 }
+export async function sendPhishingEmail(to, subject, html) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log(`[Phishing Mailer] No credentials. Would have sent "${subject}" to ${to}`);
+    // Return success in demo mode even without credentials, but log it
+    return { success: true, simulated: true };
+  }
+
+  try {
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || "CyberShield <security@cybershield.app>",
+      to,
+      subject,
+      html,
+    });
+    return { success: true };
+  } catch (err) {
+    console.error(`[Phishing Mailer] Failed to send to ${to}:`, err.message);
+    return { success: false, error: err.message };
+  }
+}
