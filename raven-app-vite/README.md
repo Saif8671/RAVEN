@@ -17,10 +17,11 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Backend
 
-Run the local API from the repo root in a second terminal:
+Run the local API from the backend project folder in a second terminal:
 
 ```bash
-node backend/server.js
+cd backend
+npm run start
 ```
 
 The Vite dev server proxies `/api` to `http://127.0.0.1:8788`, so the frontend can call the backend with a relative request.
@@ -33,7 +34,6 @@ Optional environment variables for the backend:
 - `SUPERVITY_API_URL`
 - `ALLOWED_ORIGINS`
 
-`backend/server.js` will read these from `backend/.env`, `backend/.env.local`, or the repo root `.env.local` if present.
-For a Next.js API route, keep them in the Next project root `.env.local` instead.
+`backend/src/server.js` reads these from `backend/.env`, `backend/.env.local`, or the repo root `.env.local` if present.
 
 If those Supervity credentials are missing, the backend returns a configuration error instead of a fabricated report. That keeps the frontend honest and makes it obvious when the live workflow is not connected.
