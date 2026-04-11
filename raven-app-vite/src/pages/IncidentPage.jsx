@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { GlowCard } from "../components/GlowCard";
+import { AIChatBot } from "../components/AIChatBot";
 import { getIncidentTypes, getIncidentPlaybook, diagnoseIncident } from "../services/api";
 
 const SEVERITY_COLOR = { Critical: "var(--threat)", High: "#f97316", Medium: "var(--gold)" };
@@ -259,6 +260,9 @@ export function IncidentPage() {
           <div className="feat-placeholder__text">Select an incident type to view the response playbook</div>
         </div>
       )}
+
+      {/* AI Chat Bot */}
+      <AIChatBot />
     </Motion.div>
   );
 }

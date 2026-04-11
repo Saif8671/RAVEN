@@ -1,4 +1,5 @@
 import express from 'express';
+import { chatWithGroq } from '../services/aiService.js';
 
 const router = express.Router();
 
@@ -196,6 +197,20 @@ router.post("/diagnose", (req, res) => {
     confidence: mostLikely ? `${Math.min(95, mostLikely[1] * 30 + 40)}%` : "40%",
     playbook: INCIDENT_TYPES[incidentType],
   });
+});
+
+// POST /api/incident/chat
+router.post("/chat", async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    if (!message) return res.status(400).json({ error: "Message required" });
+    
+    const reply = await chatWithGroq(message, history || []);
+    res.json({ reply });
+  } catch (error) {
+    console.error("Chat Error:", error);
+    res.status(500).json({ error: error.message || "Failed to process chat request" });
+  }
 });
 
 export default router;

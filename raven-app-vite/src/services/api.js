@@ -85,6 +85,10 @@ export async function diagnoseIncident(symptoms) {
   return request('/incident/diagnose', { symptoms });
 }
 
+export async function chatWithAI(message, history) {
+  return request('/incident/chat', { message, history });
+}
+
 // ── Report Generator ──────────────────────────────────────────
 export async function generateReport(reportData) {
   return request('/report/generate', { reportData });
