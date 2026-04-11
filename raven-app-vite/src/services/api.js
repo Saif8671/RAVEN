@@ -10,54 +10,74 @@ async function request(path, payload, method = 'POST') {
   try {
     const options = {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
-
-    if (method !== 'GET' && payload) {
-      options.body = JSON.stringify(payload);
-    }
-
+    if (method !== 'GET' && payload) options.body = JSON.stringify(payload);
     response = await fetch(`${apiBaseUrl}${path}`, options);
   } catch {
-    throw new Error(`Unable to reach the scan backend at ${apiBaseUrl}.`);
+    throw new Error(`Unable to reach the backend at ${apiBaseUrl}.`);
   }
 
   const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    throw new Error(data?.error || `Request failed with status ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(data?.error || `Request failed with status ${response.status}`);
   return data;
 }
 
-export async function runFullScan(payload) {
-  return request('/scan/full', payload);
+// ── Existing ─────────────────────────────────────────────────
+export async function checkPassword(payload) {
+  return request('/password/check', payload);
 }
 
 export async function sendReportEmail(payload) {
   return request('/report/email', payload);
 }
 
-export async function fetchReports() {
-  return request('/reports', null, 'GET');
+// ── Vulnerability Scanner ─────────────────────────────────────
+export async function scanVulnerability(domain) {
+  return request('/vulnerability/scan', { domain });
 }
 
-export async function fetchReport(reportId) {
-  return request(`/report/${reportId}`, null, 'GET');
+// ── Email Security ────────────────────────────────────────────
+export async function checkEmailSecurity(domain) {
+  return request('/email-security/check', { domain });
 }
 
-export async function runScan(payload) {
-  const result = await runFullScan(payload);
-  return result.report;
+// ── Breach Detection ──────────────────────────────────────────
+export async function checkBreach({ email, domain }) {
+  return request('/breach/check', { email, domain });
 }
 
-export async function fetchPhishingQuiz(payload) {
-  return request('/phishing/quiz', payload);
+// ── Phishing Simulation ───────────────────────────────────────
+export async function getPhishingTemplates() {
+  return request('/phishing/templates', null, 'GET');
 }
 
-export async function checkPassword(payload) {
-  return request('/password/check', payload);
+export async function createPhishingCampaign({ templateId, targetEmails, companyName }) {
+  return request('/phishing/campaign', { templateId, targetEmails, companyName });
+}
+
+export async function getCampaignResults(campaignId) {
+  return request(`/phishing/campaign/${campaignId}`, null, 'GET');
+}
+
+// ── Incident Response ─────────────────────────────────────────
+export async function getIncidentTypes() {
+  return request('/incident/types', null, 'GET');
+}
+
+export async function getIncidentPlaybook(type) {
+  return request(`/incident/playbook/${type}`, null, 'GET');
+}
+
+export async function diagnoseIncident(symptoms) {
+  return request('/incident/diagnose', { symptoms });
+}
+
+// ── Report Generator ──────────────────────────────────────────
+export async function generateReport(reportData) {
+  return request('/report/generate', { reportData });
+}
+
+export async function emailReport(to, reportData) {
+  return request('/report/email', { to, reportData });
 }

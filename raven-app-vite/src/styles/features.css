@@ -1,0 +1,1140 @@
+/* ══════════════════════════════════════════════════════════════
+   RAVEN — Feature Pages Shared Styles
+   Covers: VulnerabilityPage, EmailSecurityPage, BreachPage,
+           PhishingPage, IncidentPage
+══════════════════════════════════════════════════════════════ */
+
+/* ── Page Shell ─────────────────────────────────────────────── */
+.feat-page {
+  min-height: 100vh;
+  padding: 140px 80px 100px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Hero Block ──────────────────────────────────────────────── */
+.feat-hero {
+  margin-bottom: 52px;
+}
+
+.feat-hero__title {
+  font-family: var(--font-head);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  margin: 0 0 18px;
+}
+
+.feat-hero__title span {
+  color: var(--accent);
+}
+
+.feat-hero__copy {
+  color: var(--text2);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 680px;
+  font-weight: 300;
+}
+
+/* ── Input Card ──────────────────────────────────────────────── */
+.feat-input-card {
+  padding: 32px 36px;
+  margin-bottom: 40px;
+}
+
+.feat-input-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.feat-input {
+  flex: 1;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(208, 188, 255, 0.15);
+  background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008));
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  width: 100%;
+}
+
+.feat-input::placeholder {
+  color: rgba(202, 196, 208, 0.4);
+}
+
+.feat-input:focus {
+  border-color: rgba(208, 188, 255, 0.4);
+  box-shadow: 0 0 0 4px rgba(208, 188, 255, 0.08);
+}
+
+.feat-textarea {
+  resize: vertical;
+  font-family: var(--font-mono);
+  min-height: 80px;
+}
+
+.feat-scan-btn {
+  white-space: nowrap;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.feat-error {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(255, 180, 171, 0.1);
+  border: 1px solid rgba(255, 180, 171, 0.3);
+  color: var(--threat);
+  font-size: 0.9rem;
+}
+
+.feat-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(55, 38, 94, 0.4);
+  border-top-color: var(--accent-dark);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Section Headings ────────────────────────────────────────── */
+.feat-section-head {
+  margin: 48px 0 24px;
+}
+
+.feat-section-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 8px 0 0;
+}
+
+/* ── Results Container ───────────────────────────────────────── */
+.feat-results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── Score Ring ──────────────────────────────────────────────── */
+.feat-top-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.feat-score-card {
+  padding: 36px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.feat-score-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.feat-score-ring__inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.feat-score-ring__value {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.feat-score-ring__band {
+  font-size: 0.75rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.feat-score-domain {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text2);
+}
+
+.feat-score-time {
+  font-size: 0.78rem;
+  color: var(--text3);
+}
+
+/* ── Summary Card ────────────────────────────────────────────── */
+.feat-summary-card {
+  padding: 32px 36px;
+}
+
+.feat-summary-text {
+  color: var(--text2);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+/* ── Finding Rows ────────────────────────────────────────────── */
+.feat-findings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feat-finding-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feat-finding-row__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feat-finding-row__body {
+  flex: 1;
+}
+
+.feat-finding-row__label {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.feat-finding-row__detail {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text3);
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.feat-finding-row__badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Fix Cards ───────────────────────────────────────────────── */
+.feat-fix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.feat-fix-card {
+  padding: 28px 26px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  border-radius: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.feat-fix-card__priority {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.feat-fix-card__title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.feat-fix-card__desc {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.feat-fix-card__effort {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text3);
+}
+
+/* ── Placeholder ─────────────────────────────────────────────── */
+.feat-placeholder {
+  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  opacity: 0.4;
+}
+
+.feat-placeholder__icon {
+  font-size: 3rem;
+}
+
+.feat-placeholder__text {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  max-width: 400px;
+}
+
+/* ── Email Security ─────────────────────────────────────────── */
+.feat-email-status-card {
+  padding: 36px;
+  text-align: center;
+}
+
+.feat-email-domain {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.feat-email-badges {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.feat-email-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 28px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.feat-email-badge.found {
+  border-color: rgba(168, 240, 221, 0.3);
+  background: rgba(168, 240, 221, 0.05);
+}
+
+.feat-email-badge.missing {
+  border-color: rgba(255, 180, 171, 0.3);
+  background: rgba(255, 180, 171, 0.05);
+}
+
+.feat-email-badge__icon {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.feat-email-badge.found .feat-email-badge__icon { color: var(--teal); }
+.feat-email-badge.missing .feat-email-badge__icon { color: var(--threat); }
+
+.feat-email-badge__label {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feat-email-verdict {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 14px 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.feat-email-verdict.ok {
+  background: rgba(168, 240, 221, 0.06);
+  color: var(--teal);
+  border: 1px solid rgba(168, 240, 221, 0.2);
+}
+
+.feat-email-verdict.warn {
+  background: rgba(255, 180, 171, 0.06);
+  color: var(--threat);
+  border: 1px solid rgba(255, 180, 171, 0.2);
+}
+
+.feat-record-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feat-record-card {
+  padding: 24px;
+}
+
+.feat-record-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.feat-record-card__title {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.feat-record-card__status {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+.feat-record-card__status.ok { color: var(--teal); border-color: rgba(168,240,221,0.3); background: rgba(168,240,221,0.06); }
+.feat-record-card__status.missing { color: var(--threat); border-color: rgba(255,180,171,0.3); background: rgba(255,180,171,0.06); }
+
+.feat-record-card__value {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text2);
+  line-height: 1.5;
+  word-break: break-all;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+}
+
+.feat-record-card__missing {
+  font-size: 0.85rem;
+  color: var(--text3);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.feat-record-card__learn {
+  font-size: 0.8rem;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+/* ── Breach ─────────────────────────────────────────────────── */
+.feat-breach-inputs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.feat-breach-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feat-breach-label {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.feat-breach-divider {
+  color: var(--text3);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0 4px;
+  padding-top: 28px;
+}
+
+.feat-breach-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.feat-breach-summary.danger {
+  background: rgba(255, 180, 171, 0.06);
+  border: 1px solid rgba(255, 180, 171, 0.2);
+}
+
+.feat-breach-summary.safe {
+  background: rgba(168, 240, 221, 0.06);
+  border: 1px solid rgba(168, 240, 221, 0.2);
+}
+
+.feat-breach-summary__count {
+  font-family: var(--font-head);
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--threat);
+  line-height: 1;
+}
+
+.feat-breach-summary__safe-icon {
+  font-size: 3rem;
+  color: var(--teal);
+}
+
+.feat-breach-summary__text {
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.feat-breach-summary__advice {
+  font-size: 0.9rem;
+  color: var(--text2);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.feat-breach-result {
+  padding: 28px 32px;
+}
+
+.feat-breach-result__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.feat-breach-result__type {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.feat-breach-result__target {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.feat-breach-result__note {
+  font-size: 0.8rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-left: auto;
+}
+
+.feat-breach-result__verdict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.feat-breach-result__verdict.breached { background: rgba(255,180,171,0.08); color: var(--threat); }
+.feat-breach-result__verdict.safe { background: rgba(168,240,221,0.08); color: var(--teal); }
+
+.feat-breach-result__icon { font-size: 1.2rem; }
+.feat-breach-result__icon.safe { color: var(--teal); }
+
+.feat-breach-list__head {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+.feat-breach-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 8px;
+}
+
+.feat-breach-card__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.feat-breach-card__name {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.feat-breach-card__date {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text3);
+}
+
+.feat-breach-card__classes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.feat-breach-chip {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(208,188,255,0.1);
+  border: 1px solid rgba(208,188,255,0.2);
+  color: var(--accent);
+}
+
+.feat-breach-card__count {
+  font-size: 0.78rem;
+  color: var(--text3);
+}
+
+.feat-breach-disclaimer {
+  font-size: 0.78rem;
+  color: var(--text3);
+  text-align: center;
+  padding: 8px;
+}
+
+.feat-breach-disclaimer code {
+  font-family: var(--font-mono);
+  background: rgba(255,255,255,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ── Phishing ────────────────────────────────────────────────── */
+.feat-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 40px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.feat-step-tab {
+  flex: 1;
+  padding: 14px 20px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+  background: rgba(255,255,255,0.02);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.2s;
+}
+
+.feat-step-tab:last-child { border-right: none; }
+.feat-step-tab.active {
+  background: rgba(208,188,255,0.1);
+  color: var(--accent);
+}
+
+.feat-phish-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.feat-phish-template {
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.feat-phish-template.selected {
+  outline: 2px solid rgba(208,188,255,0.4);
+  outline-offset: 1px;
+}
+
+.feat-phish-template__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.feat-phish-template__name {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.feat-phish-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.feat-phish-template__category {
+  font-size: 0.82rem;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+.feat-phish-template__selected-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  margin-top: 8px;
+}
+
+.feat-phish-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.feat-phish-selected-tag {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text2);
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.feat-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feat-field-label {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.feat-phish-awareness {
+  padding: 28px 32px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.feat-phish-awareness--high {
+  background: rgba(255,180,171,0.08);
+  border: 1px solid rgba(255,180,171,0.25);
+}
+
+.feat-phish-awareness--medium {
+  background: rgba(255,220,168,0.08);
+  border: 1px solid rgba(255,220,168,0.25);
+}
+
+.feat-phish-awareness--low {
+  background: rgba(168,240,221,0.08);
+  border: 1px solid rgba(168,240,221,0.25);
+}
+
+.feat-phish-awareness__risk {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feat-phish-awareness--high .feat-phish-awareness__risk { color: var(--threat); }
+.feat-phish-awareness--medium .feat-phish-awareness__risk { color: var(--gold); }
+.feat-phish-awareness--low .feat-phish-awareness__risk { color: var(--teal); }
+
+.feat-phish-awareness__msg {
+  font-size: 0.95rem;
+  color: var(--text2);
+  line-height: 1.6;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.feat-results-panel {
+  padding: 32px 36px;
+}
+
+.feat-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.feat-stat-item {
+  text-align: center;
+}
+
+.feat-stat-item__value {
+  font-family: var(--font-head);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.feat-stat-item__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+}
+
+.feat-stat-bar {
+  margin-bottom: 14px;
+}
+
+.feat-stat-bar__header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.feat-stat-bar__track {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.feat-stat-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1s ease;
+}
+
+/* ── Incident ─────────────────────────────────────────────── */
+.feat-mode-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.feat-mode-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(208,188,255,0.15);
+  background: rgba(208,188,255,0.04);
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.feat-mode-btn.active {
+  background: rgba(208,188,255,0.12);
+  border-color: rgba(208,188,255,0.4);
+  color: var(--accent);
+}
+
+.feat-mode-btn:hover:not(.active) {
+  background: rgba(208,188,255,0.07);
+  border-color: rgba(208,188,255,0.25);
+}
+
+.feat-incident-types-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.feat-incident-type-card {
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.feat-incident-type-card:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.feat-incident-type-card.selected {
+  border-color: rgba(208,188,255,0.3);
+}
+
+.feat-incident-type-card__icon {
+  font-size: 2.2rem;
+  margin-bottom: 14px;
+}
+
+.feat-incident-type-card__name {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.feat-incident-type-card__severity {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.feat-symptom-grid-wrap {
+  padding: 32px 36px;
+}
+
+.feat-symptom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.feat-symptom-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.feat-symptom-item:hover {
+  border-color: rgba(208,188,255,0.2);
+  background: rgba(208,188,255,0.04);
+}
+
+.feat-symptom-item.checked {
+  border-color: rgba(208,188,255,0.4);
+  background: rgba(208,188,255,0.08);
+}
+
+.feat-symptom-item__icon { font-size: 1.1rem; flex-shrink: 0; }
+.feat-symptom-item__label { font-size: 0.88rem; color: var(--text2); flex: 1; line-height: 1.4; }
+.feat-symptom-item__check {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.feat-diagnosis-banner {
+  padding: 28px 36px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.feat-diagnosis-banner__label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.feat-diagnosis-banner__type {
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feat-diagnosis-banner__confidence {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+/* ── Playbook ─────────────────────────────────────────────── */
+.feat-playbook {
+  margin-top: 48px;
+}
+
+.feat-playbook-header {
+  margin-bottom: 32px;
+}
+
+.feat-playbook-severity {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-left: 16px;
+  vertical-align: middle;
+}
+
+.feat-phases {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.feat-phase-card {
+  padding: 28px 32px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  border-radius: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-left: 1px solid rgba(255,255,255,0.04);
+}
+
+.feat-phase-card__header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.feat-phase-card__num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.feat-phase-card__name {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.feat-phase-card__actions {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feat-phase-card__action {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.feat-phase-card__bullet {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.feat-contacts-card {
+  padding: 28px 32px;
+}
+
+.feat-contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.feat-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text2);
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.feat-contact-item__icon { font-size: 1rem; }
+
+.feat-loading {
+  text-align: center;
+  padding: 40px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .feat-page { padding: 130px 20px 80px; }
+  .feat-top-row { grid-template-columns: 1fr; }
+  .feat-score-card { flex-direction: row; padding: 24px; gap: 20px; text-align: left; }
+  .feat-record-grid { grid-template-columns: 1fr; }
+  .feat-phish-grid { grid-template-columns: 1fr; }
+  .feat-incident-types-grid { grid-template-columns: repeat(2, 1fr); }
+  .feat-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .feat-symptom-grid { grid-template-columns: 1fr; }
+  .feat-input-row { flex-direction: column; }
+  .feat-scan-btn { width: 100%; }
+  .feat-breach-inputs { flex-direction: column; }
+  .feat-breach-divider { padding: 0; }
+  .feat-email-badges { flex-direction: column; align-items: center; }
+  .feat-fix-grid { grid-template-columns: 1fr; }
+}

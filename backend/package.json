@@ -1,33 +1,23 @@
 {
-  "name": "security-checker-backend",
+  "name": "cybershield-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/server.js",
+  "description": "CyberShield Backend API",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js",
-    "smoke": "node scripts/smoke-test.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "devDependencies": {
-    "jest": "^29.7.0"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "axios": "^1.15.0",
-    "cors": "^2.8.6",
-    "crypto-js": "^4.2.0",
-    "dns-packet": "^5.6.1",
-    "dotenv": "^17.4.1",
-    "express": "^5.2.1",
-    "helmet": "^8.1.0",
-    "morgan": "^1.10.1",
-    "nodemailer": "^8.0.5",
-    "uuid": "^13.0.0",
-    "zxcvbn": "^4.4.2"
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0",
+    "dns": "^0.2.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
