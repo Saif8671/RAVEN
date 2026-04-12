@@ -9,7 +9,7 @@
 [![Groq AI](https://img.shields.io/badge/AI-Llama--3.1-orange?style=for-the-badge)](https://groq.com/)
 
 **RAVEN** is a comprehensive, enterprise-grade cybersecurity platform specifically engineered for small-to-medium businesses (SMBs). It provides a central hub for threat intelligence, vulnerability assessment, and incident governance, all wrapped in a sleek, high-performance dark glassmorphism interface.
-deploymet :https://raven-security-platform.vercel.app/
+deploymet :https://raven-security-platform-8es37ikwf-saif8671s-projects.vercel.app/
 ---
 
 ## 🛡️ Core Capabilities
