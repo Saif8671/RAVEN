@@ -188,5 +188,43 @@
       "failed": 1,
       "total": 1
     }
+  },
+  {
+    "id": "b9227606-481c-41bd-8c79-3569cefb7c33",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "max",
+    "targetEmails": [
+      "saifurrahman8671@gmail.com"
+    ],
+    "sentAt": "2026-04-12T06:52:15.866Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "saifurrahman8671@gmail.com",
+        "trackingId": "560baa48-3cc7-435d-8bd0-11952e03ae7f",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
   }
 ]

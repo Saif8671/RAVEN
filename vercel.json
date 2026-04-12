@@ -1,0 +1,10 @@
+{
+  "name": "raven-security-official",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    }
+  ],
+  "outputDirectory": "raven-app-vite/dist"
+}
