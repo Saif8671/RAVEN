@@ -54,6 +54,20 @@ export function HomePage({ setPage }) {
       page: PAGES.INCIDENT,
       icon: "🛡️",
     },
+    {
+      num: "07",
+      title: "Policy Generator",
+      desc: "Instantly create professional security, password, and incident policies for your employees.",
+      page: PAGES.POLICY,
+      icon: "📄",
+    },
+  ];
+
+  const resilienceStats = [
+    { label: "Asset Protection", value: 85, color: "#3b82f6" },
+    { label: "Employee Awareness", value: 65, color: "#10b981" },
+    { label: "Policy Compliance", value: 92, color: "#8b5cf6" },
+    { label: "Response Readiness", value: 40, color: "#f59e0b" },
   ];
 
   const container = {
@@ -122,13 +136,39 @@ export function HomePage({ setPage }) {
           ))}
         </div>
       </section>
-
       <section className="home-section home-features">
+        <div className="home-section__head">
+          <div className="section-label">Company Resilience Score</div>
+          <h2 className="home-section__title">Your security posture at a glance.</h2>
+          <p className="home-section__copy">
+            RAVEN aggregates data from your recent scans, employee training, and policy status to calculate your overall defensive strength.
+          </p>
+        </div>
+
+        <div className="home-crisis-grid" style={{ marginBottom: 60 }}>
+          {resilienceStats.map((stat) => (
+            <GlowCard key={stat.label}>
+              <div style={{ padding: "30px", textAlign: "center" }}>
+                <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: stat.color, marginBottom: "10px" }}>{stat.value}%</div>
+                <div style={{ fontSize: "0.8rem", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "1px" }}>{stat.label}</div>
+                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.1)", borderRadius: "2px", marginTop: "15px", overflow: "hidden" }}>
+                  <Motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${stat.value}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    style={{ height: "100%", background: stat.color }}
+                  ></Motion.div>
+                </div>
+              </div>
+            </GlowCard>
+          ))}
+        </div>
+
         <div className="section-label">What RAVEN does</div>
         <h2 className="home-section__title home-features__title">
-          Six tools. One platform. Complete protection.
+          Seven tools. One platform. Complete protection.
         </h2>
-        <div className="home-feature-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div className="home-feature-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
           {features.map((feature, i) => (
             <GlowCard key={feature.num} delay={i * 0.05}>
               <div

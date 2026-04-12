@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { Send, X, Bot, User, Trash2, ShieldAlert } from 'lucide-react';
+import { Send, X, Bot, Trash2, ShieldAlert } from 'lucide-react';
 import { chatWithAI } from '../services/api';
 
 export function AIChatBot() {
@@ -53,7 +53,7 @@ export function AIChatBot() {
     <>
       <AnimatePresence>
         {!isOpen && (
-          <motion.button
+          <Motion.button
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
@@ -64,13 +64,13 @@ export function AIChatBot() {
           >
             <ShieldAlert size={28} />
             <span className="feat-chatbot-fab-badge">AI</span>
-          </motion.button>
+          </Motion.button>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -129,7 +129,7 @@ export function AIChatBot() {
                 <Send size={18} />
               </button>
             </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </>

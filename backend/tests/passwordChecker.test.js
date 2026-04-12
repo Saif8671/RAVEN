@@ -1,45 +1,70 @@
+import assert from 'node:assert/strict';
+import axios from 'axios';
 import { auditPassword } from '../src/services/passwordChecker.js';
 
-jest.mock('axios');
+const originalAxiosGet = axios.get;
 
-describe('auditPassword', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+function mockNoBreachResponse() {
+  axios.get = async () => ({ data: '' });
+}
 
-  test('returns correct structure for strong password', async () => {
-    const result = await auditPassword('aVeryComplexPasswordWithSymbols#2026');
-    
-    expect(result).toHaveProperty('score');
-    expect(result).toHaveProperty('feedback');
-    expect(result).toHaveProperty('advanced');
-    expect(result).toHaveProperty('isBreached');
-    expect(result.advanced).toHaveProperty('entropy');
-    expect(result.advanced).toHaveProperty('finalScore');
-    expect(result.advanced).toHaveProperty('percent');
-    expect(result.advanced).toHaveProperty('status');
-  });
+async function runTest(name, fn) {
+  try {
+    await fn();
+    console.log(`PASS ${name}`);
+  } catch (error) {
+    console.error(`FAIL ${name}`);
+    console.error(error);
+    process.exitCode = 1;
+  } finally {
+    axios.get = originalAxiosGet;
+  }
+}
 
-  test('returns CRITICAL for weak password', async () => {
-    const result = await auditPassword('password');
-    
-    expect(result.advanced.status).toBe('CRITICAL');
-    expect(result.advanced.policies.length).toBe(false);
-  });
+await runTest('returns correct structure for strong password', async () => {
+  mockNoBreachResponse();
 
-  test('detects policies correctly', async () => {
-    const result = await auditPassword('Admin123!');
-    
-    expect(result.advanced.policies.length).toBe(true);
-    expect(result.advanced.policies.casing).toBe(true);
-    expect(result.advanced.policies.numeric).toBe(true);
-    expect(result.advanced.policies.symbols).toBe(false);
-  });
+  const result = await auditPassword('aVeryComplexPasswordWithSymbols#2026');
 
-  test('calculates entropy correctly', async () => {
-    const result = await auditPassword('ab');
-    
-    expect(result.advanced.entropy).toBeDefined();
-    expect(parseFloat(result.advanced.entropy)).toBeGreaterThan(0);
-  });
+  assert.ok(result.score !== undefined);
+  assert.ok(result.feedback !== undefined);
+  assert.ok(result.advanced !== undefined);
+  assert.ok(result.isBreached !== undefined);
+  assert.ok(result.advanced.entropy !== undefined);
+  assert.ok(result.advanced.finalScore !== undefined);
+  assert.ok(result.advanced.percent !== undefined);
+  assert.ok(result.advanced.status !== undefined);
 });
+
+await runTest('returns CRITICAL for weak password', async () => {
+  mockNoBreachResponse();
+
+  const result = await auditPassword('password');
+
+  assert.equal(result.advanced.status, 'CRITICAL');
+  assert.equal(result.advanced.policies.length, false);
+});
+
+await runTest('detects policies correctly', async () => {
+  mockNoBreachResponse();
+
+  const result = await auditPassword('Admin123!');
+
+  assert.equal(result.advanced.policies.length, false);
+  assert.equal(result.advanced.policies.casing, true);
+  assert.equal(result.advanced.policies.numeric, true);
+  assert.equal(result.advanced.policies.symbols, true);
+});
+
+await runTest('calculates entropy correctly', async () => {
+  mockNoBreachResponse();
+
+  const result = await auditPassword('ab');
+
+  assert.ok(result.advanced.entropy !== undefined);
+  assert.ok(parseFloat(result.advanced.entropy) > 0);
+});
+
+if (process.exitCode) {
+  process.exit(process.exitCode);
+}

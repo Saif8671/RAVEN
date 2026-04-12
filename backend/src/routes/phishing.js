@@ -1,12 +1,40 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import * as mailer from '../utils/mailer.js';
 import { getPhishingHTML } from '../utils/phishingTemplates.js';
 
 const router = express.Router();
 
-// In-memory store for demo (use DB in production)
-const campaigns = new Map();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DB_PATH = path.resolve(__dirname, '../data/campaigns.json');
+
+// Helper to load campaigns from JSON
+function loadCampaigns() {
+  try {
+    if (fs.existsSync(DB_PATH)) {
+      const data = fs.readFileSync(DB_PATH, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.error('[Phishing] Failed to load campaigns:', err.message);
+  }
+  return [];
+}
+
+// Helper to save campaigns to JSON
+function saveCampaigns(campaigns) {
+  try {
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(DB_PATH, JSON.stringify(campaigns, null, 2));
+  } catch (err) {
+    console.error('[Phishing] Failed to save campaigns:', err.message);
+  }
+}
 
 const PHISHING_TEMPLATES = [
   {
@@ -93,6 +121,26 @@ router.get("/templates", (req, res) => {
   })));
 });
 
+// GET /api/phishing/campaigns - List all campaigns
+router.get("/campaigns", (req, res) => {
+  const campaigns = loadCampaigns();
+  // Return summarized list for dashboard
+  res.json(campaigns.map(c => {
+    const total = c.targetEmails.length;
+    const clicked = c.results.filter(r => r.clicked).length;
+    return {
+      id: c.id,
+      name: c.companyName,
+      template: c.template.name,
+      sentAt: c.sentAt,
+      status: c.status,
+      targets: total,
+      clicks: clicked,
+      clickRate: total > 0 ? Math.floor((clicked / total) * 100) : 0
+    };
+  }).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt)));
+});
+
 // POST /api/phishing/campaign
 router.post("/campaign", async (req, res) => {
   const { templateId, targetEmails, companyName } = req.body;
@@ -125,34 +173,65 @@ router.post("/campaign", async (req, res) => {
     results,
   };
 
-  campaigns.set(campaignId, campaign);
+  const campaigns = loadCampaigns();
+  campaigns.push(campaign);
+  saveCampaigns(campaigns);
 
   // Send emails in background
   const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
   
   (async () => {
     let sentCount = 0;
+    let failedCount = 0;
     for (const recipient of results) {
       const trackingUrl = `${backendUrl}/api/phishing/track/${campaignId}?tid=${recipient.trackingId}&type=click`;
       const html = getPhishingHTML(templateId, trackingUrl, cName);
       
-      const res = await mailer.sendPhishingEmail(recipient.email, template.subject, html);
-      if (res.success) sentCount++;
+      const emailRes = await mailer.sendPhishingEmail(recipient.email, template.subject, html);
+      if (emailRes.success) {
+        sentCount++;
+      } else {
+        failedCount++;
+        console.warn(`[Phishing] Delivery failed for ${recipient.email}: ${emailRes.reason || emailRes.error || "unknown error"}`);
+      }
     }
-    campaign.status = "sent";
+    
+    // Update status to reflect the actual delivery result.
+    const activeCampaigns = loadCampaigns();
+    const cIdx = activeCampaigns.findIndex(c => c.id === campaignId);
+    if (cIdx !== -1) {
+      activeCampaigns[cIdx].status =
+        sentCount === targetEmails.length ? "sent" : sentCount > 0 ? "partial" : "failed";
+      activeCampaigns[cIdx].delivery = {
+        sent: sentCount,
+        failed: failedCount,
+        total: targetEmails.length,
+      };
+      saveCampaigns(activeCampaigns);
+    }
     console.log(`[Phishing] Campaign ${campaignId} finished sending. ${sentCount}/${targetEmails.length} delivered.`);
-  })();
+  })().catch((err) => {
+    console.error(`[Phishing] Campaign ${campaignId} background send failed:`, err.message);
+  });
 
   res.json({
     campaignId,
     message: `Phishing simulation campaign started for ${targetEmails.length} target(s)`,
     template: template.name,
+    delivery: process.env.EMAIL_USER && process.env.EMAIL_PASS
+      ? { mode: "smtp" }
+      : {
+          mode: "disabled",
+          note: "Email credentials are not configured, so no real phishing email will be delivered.",
+        },
   });
 });
 
 // GET /api/phishing/campaign/:id
 router.get("/campaign/:id", (req, res) => {
-  const campaign = campaigns.get(req.params.id);
+  const campaigns = loadCampaigns();
+  const campaign = campaigns.find(c => c.id === req.params.id);
+  
   if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
   const total = campaign.targetEmails.length;
@@ -180,9 +259,14 @@ router.get("/campaign/:id", (req, res) => {
 // GET /api/phishing/track/:campaignId
 router.get("/track/:campaignId", (req, res) => {
   const { type, tid } = req.query;
-  const campaign = campaigns.get(req.params.campaignId);
+  const campaigns = loadCampaigns();
+  const cIdx = campaigns.findIndex(c => c.id === req.params.campaignId);
   
-  if (campaign) {
+  let templateId = 'it_password_reset';
+
+  if (cIdx !== -1) {
+    const campaign = campaigns[cIdx];
+    templateId = campaign.templateId;
     const recipient = campaign.results.find((r) => r.trackingId === tid);
     if (recipient) {
       if (type === "click") {
@@ -191,12 +275,14 @@ router.get("/track/:campaignId", (req, res) => {
       } else if (type === "open") {
         recipient.opened = true;
       }
+      saveCampaigns(campaigns);
     }
   }
 
   // Redirect to frontend awareness page
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-  res.redirect(`${frontendUrl}/phishing-awareness`);
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  // Pass templateId so awareness page can show right red flags
+  res.redirect(`${frontendUrl}/?page=phishing-awareness&templateId=${templateId}`);
 });
 
 export default router;

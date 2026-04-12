@@ -26,3 +26,12 @@ Thumbs.db
 
 # Ignore coverage and lock artifacts if present
 coverage/
+
+# Environment files
+.env
+.env.local
+backend/.env
+raven-app-vite/.env
+
+# Node modules at root if any
+node_modules/

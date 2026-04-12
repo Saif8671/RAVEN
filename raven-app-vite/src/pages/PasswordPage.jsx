@@ -46,7 +46,6 @@ export function PasswordPage() {
         <header className="elite-header">
           <div className="elite-subtitle">Secure Encryption Interface</div>
           <h1 className="elite-title">Security Scanner </h1>
-          <h1 className="elite-title">Security Scanner </h1>
         </header>
 
         <main className="elite-glass-card">

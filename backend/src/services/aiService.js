@@ -12,6 +12,8 @@ Prioritize steps that stop the bleeding, preserve evidence, and ensure safety.
 Use Markdown for clear formatting, such as bullet points for lists and bold text for emphasis.
 If the user shares symptoms of an incident (e.g., ransomware, phishing), provide immediate containment steps before anything else.`;
 
+const DEFAULT_GROQ_MODEL = 'llama-3.1-8b-instant';
+
 export async function chatWithGroq(message, history = []) {
   try {
     if (!process.env.GROQ_API_KEY) {
@@ -33,7 +35,7 @@ export async function chatWithGroq(message, history = []) {
 
     const chatCompletion = await groq.chat.completions.create({
       messages: messages,
-      model: 'llama3-8b-8192',
+      model: process.env.GROQ_MODEL || DEFAULT_GROQ_MODEL,
       temperature: 0.3,
       max_tokens: 1024,
     });

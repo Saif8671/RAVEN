@@ -145,6 +145,30 @@ async function run() {
     }
   });
 
+  // ── Policy Generator ───────────────────
+  console.log("\n[ Policy Generator ]");
+  await test("GET /api/policy/list", async () => {
+    const d = await req("/policy/list", null, "GET");
+    if (!Array.isArray(d) || d.length === 0) throw new Error("No policies returned");
+    return `${d.length} policies`;
+  });
+
+  await test("GET /api/policy/acceptable_use", async () => {
+    const d = await req("/policy/acceptable_use", null, "GET");
+    if (!d.content) throw new Error("Missing content");
+    return `loaded: ${d.name}`;
+  });
+
+  await test("GET /api/policy/invalid → 404", async () => {
+    try {
+      await req("/policy/invalid_id", null, "GET");
+      throw new Error("Should have 404'd");
+    } catch (e) {
+      return "correctly 404'd";
+    }
+  });
+
+
   // ── Incident Response ─────────────────────
   console.log("\n[ Incident Response ]");
   await test("GET /api/incident/types", async () => {

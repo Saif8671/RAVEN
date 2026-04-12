@@ -1,0 +1,192 @@
+[
+  {
+    "id": "5a60442c-9fbb-4987-a6d1-6e53dbcb071c",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "Acme Corp",
+    "targetEmails": [
+      "test@example.com"
+    ],
+    "sentAt": "2026-04-12T06:17:30.892Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "test@example.com",
+        "trackingId": "5bcc635a-c020-4546-b7d0-b38123910865",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
+  },
+  {
+    "id": "ef61d394-6b57-430f-a751-eb7f68db57c5",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "Acme Corp",
+    "targetEmails": [
+      "test@example.com"
+    ],
+    "sentAt": "2026-04-12T06:20:49.379Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "test@example.com",
+        "trackingId": "2e21958b-1048-4e51-9abf-eac28cccead1",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
+  },
+  {
+    "id": "9f5fd8b3-60bf-4e0a-ae08-745b81b90e0a",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "Acme Corp",
+    "targetEmails": [
+      "test@example.com"
+    ],
+    "sentAt": "2026-04-12T06:21:05.955Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "test@example.com",
+        "trackingId": "00322a75-8eef-439e-a75d-273b4ddd8c7a",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
+  },
+  {
+    "id": "185d2547-898b-4154-8810-46c5d9df1458",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "Acme Corp",
+    "targetEmails": [
+      "test@example.com"
+    ],
+    "sentAt": "2026-04-12T06:21:17.378Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "test@example.com",
+        "trackingId": "42cfc11d-3b26-44d1-91c9-629b19e0c6c1",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
+  },
+  {
+    "id": "54cf841e-bc9b-46cd-8f31-f744952742af",
+    "templateId": "it_password_reset",
+    "template": {
+      "id": "it_password_reset",
+      "name": "IT Password Reset",
+      "subject": "URGENT: Your password expires in 24 hours",
+      "previewText": "Action required to keep your account active",
+      "difficulty": "Easy",
+      "category": "Credential Theft",
+      "redFlags": [
+        "Creates urgency with fake deadline",
+        "Asks you to click a link to avoid account lockout",
+        "Generic greeting, not personalised",
+        "Sender domain doesn't match company"
+      ]
+    },
+    "companyName": "Acme Corp",
+    "targetEmails": [
+      "test@example.com"
+    ],
+    "sentAt": "2026-04-12T06:21:35.674Z",
+    "status": "failed",
+    "results": [
+      {
+        "email": "test@example.com",
+        "trackingId": "40ccaeae-93c9-44eb-95f0-6d34e529bec8",
+        "opened": false,
+        "clicked": false,
+        "reported": false
+      }
+    ],
+    "delivery": {
+      "sent": 0,
+      "failed": 1,
+      "total": 1
+    }
+  }
+]

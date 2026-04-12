@@ -12,6 +12,10 @@ function createTransporter() {
   });
 }
 
+function hasEmailCredentials() {
+  return Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+}
+
 export function buildReportHTML(reportData) {
   const { domain, score, findings, plainEnglishSummary, fixGuide } = reportData;
   const scoreColor = score?.color || "#eab308";
@@ -53,7 +57,7 @@ export function buildReportHTML(reportData) {
 }
 
 export async function sendReportEmail(to, reportData) {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  if (!hasEmailCredentials()) {
     console.log("[Mailer] Email not configured. Skipping email send.");
     return { success: false, reason: "No credentials" };
   }
@@ -73,10 +77,9 @@ export async function sendReportEmail(to, reportData) {
   }
 }
 export async function sendPhishingEmail(to, subject, html) {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log(`[Phishing Mailer] No credentials. Would have sent "${subject}" to ${to}`);
-    // Return success in demo mode even without credentials, but log it
-    return { success: true, simulated: true };
+  if (!hasEmailCredentials()) {
+    console.log(`[Phishing Mailer] Email not configured. Skipping "${subject}" to ${to}`);
+    return { success: false, reason: "No credentials" };
   }
 
   try {

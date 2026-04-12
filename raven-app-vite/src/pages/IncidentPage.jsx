@@ -87,7 +87,8 @@ export function IncidentPage() {
     try {
       const data = await getIncidentPlaybook(type);
       setPlaybook(data);
-    } catch (e) {
+    } catch (error) {
+      console.error("Failed to load incident playbook:", error);
       setPlaybook(null);
     } finally {
       setLoadingPlaybook(false);
@@ -103,8 +104,8 @@ export function IncidentPage() {
       setDiagnosis(data);
       setSelectedType(data.diagnosedType);
       setPlaybook(data.playbook);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error("Failed to diagnose incident:", error);
     } finally {
       setLoadingDiagnose(false);
     }

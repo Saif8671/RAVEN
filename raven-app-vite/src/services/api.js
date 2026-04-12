@@ -64,6 +64,10 @@ export async function getPhishingTemplates() {
   return request('/phishing/templates', null, 'GET');
 }
 
+export async function getPhishingCampaigns() {
+  return request('/phishing/campaigns', null, 'GET');
+}
+
 export async function createPhishingCampaign({ templateId, targetEmails, companyName }) {
   return request('/phishing/campaign', { templateId, targetEmails, companyName });
 }
@@ -96,4 +100,13 @@ export async function generateReport(reportData) {
 
 export async function emailReport(to, reportData) {
   return request('/report/email', { to, reportData });
+}
+
+// ── Policy Generator ──────────────────────────────────────────
+export async function getPolicies() {
+  return request('/policy', null, 'GET');
+}
+
+export async function getPolicy(id) {
+  return request(`/policy/${id}`, null, 'GET');
 }
